@@ -55,5 +55,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# test
+# other
 test/
+design/
