@@ -1,0 +1,59 @@
+# python
+venv/
+__pycache__/
+*.py[cod]
+
+# dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.*
+
+# local state & database
+database/
+brain_memory.json
+chat_history.json
+
+# testing
+/coverage
+
+# next.js
+.next/
+/out/
+
+# production
+/build
+
+# tools & ide
+.claude/
+.home/
+.dart-config/
+.dart-tool/
+.dartServer/
+.idea/
+.vscode/
+
+# temp files
+*unlinked*-temp-*
+*.tmp
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# test
+test/

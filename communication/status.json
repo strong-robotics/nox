@@ -1,0 +1,29 @@
+{
+    "project": "Collegiate Discussion",
+    "last_updated": "2026-03-25T01:31:25Z",
+    "run_id": "COMM-012",
+    "first_speaker": "Antigravity",
+    "round_cap": 5,
+    "turn_counters": {
+        "Antigravity": 5,
+        "Cursor": 4
+    },
+    "pipeline": [
+        {
+            "role": "Antigravity",
+            "status": "completed",
+            "description": ""
+        },
+        {
+            "role": "Cursor",
+            "status": "completed",
+            "description": ""
+        },
+        {
+            "role": "User",
+            "status": "ready",
+            "description": ""
+        }
+    ],
+    "current_task": ""
+}

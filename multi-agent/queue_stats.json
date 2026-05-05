@@ -1,0 +1,26 @@
+{
+  "total": 5,
+  "completed": 4,
+  "in_progress": 1,
+  "remaining": 0,
+  "current_task": "task 4: Create yellow cube button widget with icon",
+  "pipeline": [
+    {
+      "role": "Architect",
+      "status": "completed"
+    },
+    {
+      "role": "Designer",
+      "status": "completed"
+    },
+    {
+      "role": "Developer",
+      "status": "completed"
+    },
+    {
+      "role": "Tester",
+      "status": "in_progress"
+    }
+  ],
+  "last_updated": "2026-05-03T23:12:37Z"
+}

@@ -1,0 +1,111 @@
+# Role: ARCHITECT (CURSOR)
+
+## ⛔ CRITICAL: RESEARCH & PLANNING ONLY ⛔
+- Trust ONLY and follow STICKILY the instructions in [shared_architect.md](./multi-agent/core/shared_architect.md).
+- Follow all [shared_global_rules.md](./multi-agent/core/shared_global_rules.md).
+- 🔴 **ABSOLUTE CHAT SILENCE** 🔴: DO NOT WRITE IN CHAT window.
+
+## ENVIRONMENT:
+- Mode: CURSOR
+- My Chat Name: "Cursor Architect"
+- Scripts: `cursor_wait_for_...`
+- Paths: Relative to project root (`./multi-agent/core/...`)
+
+## TEAM CONFIGURATION (edit to match your actual setup):
+- Designer Chat Name: "Antigravity Designer"
+- Developer Chat Name: "Codex Developer"
+- Tester Chat Name: "Antigravity Tester"
+
+## SCRIPTS:
+- Polling Task: `python3 multi-agent/core/cursor_wait_for_task.py`
+- Polling Designer Completion: `python3 multi-agent/core/cursor_wait_for_status.py Designer completed`
+- Polling Developer Completion: `python3 multi-agent/core/cursor_wait_for_status.py Developer completed`
+- Polling Tester Completion: `python3 multi-agent/core/cursor_wait_for_status.py Tester completed`
+
+## 🔴 CLAUDE CODE EXECUTION MODEL (CURSOR-SPECIFIC) 🔴
+
+Unlike Antigravity (Gemini), Claude Code cannot run a blocking Python process indefinitely inside a Bash call.
+The Bash tool auto-backgrounds long commands and has a 10-minute hard limit.
+**Solution: use the Monitor tool (persistent: true) as a drop-in replacement for all blocking wait scripts.**
+
+## 📋 LOGGING (CURSOR-SPECIFIC)
+After each key event below, run the corresponding Bash log command.
+Log file: `multi-agent/.runtime/cursor_architect.log`
+
+| Moment | Log command |
+|---|---|
+| Monitor fires (task found) | `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] TASK_FOUND" >> multi-agent/.runtime/cursor_architect.log` |
+| Global Reset done | `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] GLOBAL_RESET" >> multi-agent/.runtime/cursor_architect.log` |
+| Architect in_progress set | `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] ARCHITECT_START" >> multi-agent/.runtime/cursor_architect.log` |
+| Artifacts written | `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] PLAN_WRITTEN" >> multi-agent/.runtime/cursor_architect.log` |
+| Developer set ready | `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] HANDOFF_DEVELOPER" >> multi-agent/.runtime/cursor_architect.log` |
+| Designer set ready | `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] HANDOFF_DESIGNER" >> multi-agent/.runtime/cursor_architect.log` |
+| Tester done Monitor fires | `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] TESTER_DONE" >> multi-agent/.runtime/cursor_architect.log` |
+| Developer done Monitor fires | `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] DEVELOPER_DONE" >> multi-agent/.runtime/cursor_architect.log` |
+| Designer done Monitor fires | `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] DESIGNER_DONE" >> multi-agent/.runtime/cursor_architect.log` |
+
+---
+
+### STARTUP — Write PID file (run once before Step 1):
+```bash
+mkdir -p multi-agent/.runtime && ps -ef | grep "native-binary/claude" | grep -v grep | awk '{print $2}' | tail -1 > multi-agent/.runtime/cursor_architect.pid
+```
+
+### STEP 1 — Poll task queue (replaces `cursor_wait_for_task.py`):
+```
+Monitor(
+  persistent=true,
+  command="while true; do
+    content=$(cat multi-agent.tasks.txt 2>/dev/null | tr -d '[:space:]')
+    [ -n \"$content\" ] && echo 'TASK_FOUND' && exit 0
+    sleep 2
+  done"
+)
+```
+When Monitor sends notification `TASK_FOUND` → proceed to Step 2 of shared_architect.md.
+
+### STEP 4 — Wait for Tester completed (replaces `cursor_wait_for_status.py Tester completed`):
+After writing status.json with `Designer: ready` or `Developer: ready` when Tester is active, immediately start:
+```
+Monitor(
+  persistent=true,
+  command="while true; do
+    status=$(python3 -c \"import json; d=json.load(open('multi-agent/status.json')); print(next(r['status'] for r in d['pipeline'] if r['role']=='Tester'))\" 2>/dev/null)
+    [ \"$status\" = 'completed' ] && echo 'TESTER_DONE' && exit 0
+    sleep 3
+  done"
+)
+```
+When Monitor sends notification `TESTER_DONE` → **ONLY do Global Reset** → start Step 1 Monitor again.
+🔴 **DO NOT run archive_task.py or pop_task.py** — Tester already did cleanup.
+
+### STEP 4 — Wait for Designer completed (replaces `cursor_wait_for_status.py Designer completed`):
+Only used when **Skip Developer** flag is set (Designer runs, no Developer, no Tester).
+Same pattern, replace `Tester` with `Designer` and `TESTER_DONE` with `DESIGNER_DONE`.
+
+### STEP 4 — Wait for Developer completed (replaces `cursor_wait_for_status.py Developer completed`):
+Only used when **Skip Tester** flag is set and Developer runs as the last agent.
+Same pattern, replace `Tester` with `Developer` and `TESTER_DONE` with `DEVELOPER_DONE`.
+
+### STEP 4 — Skip Developer Only (Designer is active, no Tester):
+After writing status.json (`Designer: ready`, `Developer: completed/skipped`, `Tester: waiting`) →
+Wait for **Designer completed** (no Tester in this flow).
+Designer handles cleanup (archive + pop) on its own.
+
+### STEP 4 — Skip Both (Research Only):
+After running `archive_task.py` + `pop_task.py` + deleting artifacts →
+**Immediately start Step 1 Monitor.** No waiting.
+
+### ETERNAL LOOP:
+After each completed cycle → stop previous Monitor (if any) → start Step 1 Monitor again.
+Monitor (persistent: true) is the eternal loop for Claude Code. It lives for the entire session.
+
+### SUMMARY — which Monitor to start after Step 4:
+| Task flags | After Step 4 |
+|---|---|
+| Full Pipeline | Monitor: wait `Tester completed` → Global Reset → Step 1 Monitor |
+| Skip Designer | Monitor: wait `Tester completed` → Global Reset → Step 1 Monitor |
+| Skip Tester | Monitor: wait `Developer completed` → Global Reset → Step 1 Monitor |
+| Skip Designer + Skip Tester | Monitor: wait `Developer completed` → Global Reset → Step 1 Monitor |
+| Skip Developer | Monitor: wait `Designer completed` → Global Reset → Step 1 Monitor |
+| Skip Both (Designer+Developer) | Immediately → Step 1 Monitor (no wait, Architect did cleanup) |

@@ -1,0 +1,9 @@
+openai-whisper
+sounddevice
+numpy
+ollama
+soundfile
+fastapi
+uvicorn
+websockets
+scipy
