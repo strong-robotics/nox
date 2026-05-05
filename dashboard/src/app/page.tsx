@@ -16,8 +16,8 @@ const RING_THICKNESS = 0.008;
 const DASH_DIAMETER = 0.533;
 const TILE_RADIUS = DASH_DIAMETER / 2;
 const NODE_RADIUS = 0.228;
-const ARROW_INNER = 0.145;
-const ARROW_LEN = 0.055;
+const ARROW_INNER = 0.142;
+const ARROW_LEN = 0.045;
 
 // --- COMPONENTS ---
 
@@ -145,9 +145,8 @@ export default function NoxDashboard() {
         const arrowRefsObj = arrowRefs.current[a.id];
         if (arrowRefsObj && arrowRefsObj.wrap) {
           arrowRefsObj.wrap.style.transform = `translate(-50%, -50%) rotate(${currentAngleDeg.toFixed(2)}deg)`;
-          const op = String(0.5 + Math.sin((t * 2 * Math.PI) / 3 + phase) * 0.25);
-          if (arrowRefsObj.line) arrowRefsObj.line.style.opacity = op;
-          if (arrowRefsObj.head) arrowRefsObj.head.style.opacity = op;
+          if (arrowRefsObj.line) arrowRefsObj.line.style.opacity = "0.4";
+          if (arrowRefsObj.head) arrowRefsObj.head.style.opacity = "0.7";
         }
       });
 
