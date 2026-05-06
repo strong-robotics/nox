@@ -5,10 +5,10 @@ import NeuralCore from "@/components/NeuralCore";
 
 // --- CONFIGURATION ---
 const AGENTS = [
-  { id: "architect", label: "ARCHITECT", model: "Gemini Flash 3", status: "ACTIVE", time: "02:14:32", angle: -90, color: "#FF5C5C", gradFrom: "#FF8E8E", gradTo: "#FF5C5C", icon: "architect" },
-  { id: "developer", label: "DEVELOPER", model: "Claude", status: "WAITING", time: "", angle: 0, color: "#7C5CFF", gradFrom: "#A08EFF", gradTo: "#7C5CFF", icon: "developer" },
-  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "WAITING", time: "", angle: 90, color: "#27D69E", gradFrom: "#3BE3AC", gradTo: "#27D69E", icon: "tester" },
-  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "WAITING", time: "", angle: 180, color: "#FFB547", gradFrom: "#FFCC85", gradTo: "#FFB547", icon: "designer" },
+  { id: "architect", label: "ARCHITECT", model: "Gemini Flash 3", status: "ACTIVE", time: "02:14:32", angle: 0, color: "#FF5C5C", gradFrom: "#FF8E8E", gradTo: "#FF5C5C", icon: "architect" },
+  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "WAITING", time: "", angle: -90, color: "#FFB547", gradFrom: "#FFCC85", gradTo: "#FFB547", icon: "designer" },
+  { id: "developer", label: "DEVELOPER", model: "Claude", status: "WAITING", time: "", angle: 90, color: "#7C5CFF", gradFrom: "#A08EFF", gradTo: "#7C5CFF", icon: "developer" },
+  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "WAITING", time: "", angle: 180, color: "#27D69E", gradFrom: "#3BE3AC", gradTo: "#27D69E", icon: "tester" },
 ];
 
 const TASKS = [
@@ -77,7 +77,7 @@ function AgentStatusCard({ agent }: { agent: typeof AGENTS[0] }) {
         <div className="flex items-center gap-3 mt-1">
           <div className="flex items-center gap-1.5">
             <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-green-400' : 'bg-slate-300'}`} />
-            <div className={`text-[9px] font-bold tracking-widest uppercase ${isActive ? 'text-green-500' : 'text-slate-400'}`}>{agent.status}</div>
+            <div className={`text-[9px] font-bold uppercase ${isActive ? 'text-green-500' : 'text-slate-400'}`}>{agent.status}</div>
           </div>
         </div>
       </div>
@@ -256,7 +256,7 @@ export default function NoxDashboard() {
                            {t.status === 'IN PROGRESS' && (
                              <>
                                <div className="text-[9px] font-mono text-slate-400 font-bold uppercase">{t.time}</div>
-                               <div className="text-[9px] font-bold uppercase tracking-wider text-green-500">{t.status}</div>
+                               <div className="text-[9px] font-bold uppercase text-green-500">{t.status}</div>
                              </>
                            )}
                         </div>
@@ -264,11 +264,74 @@ export default function NoxDashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
 
+      {/* RIGHT SIDEBAR - CURRENT TASK & PROGRESS */}
+      <div className="absolute right-6 top-[152px] bottom-6 w-[340px] flex flex-col z-40">
+        <div className="flex justify-between items-end mb-2 px-2">
+          <div className="text-[12px] font-bold text-[#52525b] uppercase">Current Task</div>
+        </div>
+
+        <div className="flex-1 overflow-hidden border-2 border-dashed border-[#B8BCCF]/80 rounded-xl flex flex-col bg-white/10 p-5">
+          {/* Main Task Highlight */}
+          <div className="bg-white/70 rounded-xl p-4 mb-4 border border-white/50 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">01</div>
+            <div className="flex flex-col">
+               <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">Create a red cube button widget</div>
+               <div className="text-[11px] text-[#52525b] mt-0.5">Flutter Stack</div>
+            </div>
+          </div>
+
+          {/* Multiline Task Description */}
+          <div className="px-1 mb-8">
+            <div className="text-[12px] leading-relaxed text-[#52525b]">
+              Create test/red_cube_button.dart with a StatelessWidget called RedCubeButton. It's a 80x80 red square (BoxDecoration, color: Colors.red) that prints "Red pressed" to console on tap. No external dependencies.
+            </div>
+          </div>
+
+          <div className="mb-6 ml-1 text-[12px] font-bold text-[#52525b] uppercase">Step Progress</div>
+          
+          <div className="flex-1 relative">
+            <div className="flex flex-col gap-9 relative">
+              {/* Vertical Dashed Line - Ends at the last agent circle */}
+              <div className="absolute left-[15px] top-4 bottom-4 border-l-[1.5px] border-dashed border-slate-300" />
+              
+              {[
+                { n: 1, name: 'ARCHITECT', status: 'ACTIVE', time: '02:14:32', desc: 'Analyzing instructions...', color: '#FF5C5C' },
+                { n: 2, name: 'DESIGNER', status: 'SKIPPED', time: '', desc: 'Task skip: True', color: '#FFB547' },
+                { n: 3, name: 'DEVELOPER', status: 'WAITING', time: '', desc: 'Waiting for design', color: '#7C5CFF' },
+                { n: 4, name: 'TESTER', status: 'SKIPPED', time: '', desc: 'Task skip: True', color: '#27D69E' },
+              ].map((s) => (
+                <div key={s.n} className="flex items-center gap-4 relative">
+                  <div 
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold z-10 transition-all ${s.status === 'ACTIVE' ? 'text-white shadow-lg scale-110' : s.status === 'SKIPPED' ? 'text-white/60' : 'text-white'}`}
+                    style={{ 
+                      backgroundColor: s.color,
+                      boxShadow: s.status === 'ACTIVE' ? `0 4px 14px ${s.color}88` : `0 2px 8px ${s.color}44`
+                    }}
+                  >
+                    {s.n}
+                  </div>
+                  <div className="flex-1 flex items-center justify-between min-w-0">
+                    <div className="flex flex-col justify-center">
+                      <div className={`text-[12px] font-bold tracking-tight leading-none ${s.status === 'ACTIVE' ? 'text-red-500' : s.status === 'SKIPPED' ? 'text-slate-300' : 'text-[#1a2b4b]'}`}>{s.name}</div>
+                      <div className="text-[11px] text-[#52525b] mt-1.5 leading-none">{s.status === 'ACTIVE' ? s.desc : s.status === 'SKIPPED' ? 'Skipped' : 'Waiting...'}</div>
+                    </div>
+                    {s.time && (
+                      <div className="text-[10px] font-mono text-slate-400 font-bold ml-4">
+                        {s.time}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* MAIN ORBIT AREA (Centered in Viewport) */}
       <div className="w-full h-full relative flex items-center justify-center">
