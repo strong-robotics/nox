@@ -6,18 +6,17 @@ import NeuralCore from "@/components/NeuralCore";
 // --- CONFIGURATION ---
 const AGENTS = [
   { id: "architect", label: "ARCHITECT", model: "Gemini Flash 3", status: "ACTIVE", time: "02:14:32", angle: 0, color: "#FF5C5C", gradFrom: "#FF8E8E", gradTo: "#FF5C5C", icon: "architect" },
-  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "WAITING", time: "", angle: -90, color: "#FFB547", gradFrom: "#FFCC85", gradTo: "#FFB547", icon: "designer" },
-  { id: "developer", label: "DEVELOPER", model: "Claude", status: "WAITING", time: "", angle: 90, color: "#7C5CFF", gradFrom: "#A08EFF", gradTo: "#7C5CFF", icon: "developer" },
-  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "WAITING", time: "", angle: 180, color: "#27D69E", gradFrom: "#3BE3AC", gradTo: "#27D69E", icon: "tester" },
+  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: -90, color: "#FFB547", gradFrom: "#FFCC85", gradTo: "#FFB547", icon: "designer" },
+  { id: "developer", label: "DEVELOPER", model: "Claude", status: "INACTIVE", time: "", angle: 90, color: "#7C5CFF", gradFrom: "#A08EFF", gradTo: "#7C5CFF", icon: "developer" },
+  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: 180, color: "#27D69E", gradFrom: "#3BE3AC", gradTo: "#27D69E", icon: "tester" },
 ];
 
 const TASKS = [
-  { id: "01", title: "Create a red cube button", desc: "StatelessWidget, 80x80 red square", status: "IN PROGRESS", time: "Started 16:42", color: "#FF5C5C" },
-  { id: "02", title: "Create a blue cube button", desc: "StatelessWidget, color: Colors.blue", status: "QUEUED", time: "Queued", color: "#7C5CFF" },
-  { id: "03", title: "Create a green cube button", desc: "StatefulWidget with counter", status: "QUEUED", time: "Queued", color: "#27D69E" },
-  { id: "04", title: "Create a yellow cube button", desc: "StatelessWidget with star icon", status: "QUEUED", time: "Queued", color: "#FFB547" },
-  { id: "05", title: "Create a purple cube button", desc: "Disables after 3 taps", status: "QUEUED", time: "Queued", color: "#A08EFF" },
-  { id: "06", title: "Create a white cube button", desc: "Disables after 4 taps", status: "QUEUED", time: "Queued", color: "#E2E4F0" },
+  { id: "01", title: "Create a red cube button widget", desc: "Flutter Stack", status: "IN PROGRESS", time: "02:14:32", color: "#FF5C5C" },
+  { id: "02", title: "Create a blue cube button widget", desc: "Flutter Stack", status: "QUEUED", time: "Queued", color: "#7C5CFF" },
+  { id: "03", title: "Create a green cube button widget with counter", desc: "Flutter Stack", status: "QUEUED", time: "Queued", color: "#27D69E" },
+  { id: "04", title: "Create a yellow cube button widget with icon", desc: "Flutter Stack", status: "QUEUED", time: "Queued", color: "#FFB547" },
+  { id: "05", title: "Create a purple cube button that disables after 3 taps", desc: "Flutter Stack", status: "QUEUED", time: "Queued", color: "#A08EFF" },
 ];
 
 const RING_DIAMETER = 0.403;
@@ -240,26 +239,27 @@ export default function NoxDashboard() {
 
       {/* TASK QUEUE SIDEBAR */}
       <div className="absolute left-6 top-[152px] bottom-6 w-[340px] flex flex-col z-40">
-        <div className="mb-2 ml-2 text-[12px] font-bold text-[#52525b] uppercase">TASK QUEUE</div>
+        <div className="mb-2 ml-2 text-[12px] font-bold text-[#52525b] uppercase tracking-wider">TASK QUEUE</div>
         
         <div className="flex-1 overflow-hidden border-2 border-dashed border-[#B8BCCF]/80 rounded-xl flex flex-col bg-white/10">
           <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
             <div className="flex flex-col">
               {TASKS.map((t, i) => (
-                <div key={t.id} className={`p-4 transition-all hover:bg-white/40 ${i < TASKS.length - 1 ? 'border-b border-dashed border-[#B8BCCF]' : ''}`}>
-                  <div className="flex items-center gap-4">
-                     <div className="text-[14px] font-bold text-slate-400">{t.id}</div>
-                     <div className="flex flex-col gap-0.5">
+                <div key={t.id} className={`p-4 flex items-center ${i < TASKS.length - 1 ? 'border-b border-dashed border-[#B8BCCF]' : ''}`}>
+                  <div className="flex items-center gap-4 w-full">
+                     {/* Task Number Only */}
+                     <div className="text-lg font-bold text-[#3D7BFF] min-w-[28px]">
+                        {t.id}
+                     </div>
+                     <div className="flex flex-col justify-center">
                         <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">{t.title}</div>
-                        <div className="text-[11px] text-[#52525b] font-medium leading-tight">{t.desc}</div>
-                        <div className="flex items-center gap-4 mt-2">
-                           {t.status === 'IN PROGRESS' && (
-                             <>
-                               <div className="text-[9px] font-mono text-slate-400 font-bold uppercase">{t.time}</div>
-                               <div className="text-[9px] font-bold uppercase text-green-500">{t.status}</div>
-                             </>
-                           )}
-                        </div>
+                        <div className="text-[11px] text-[#52525b] font-medium mt-0.5 leading-relaxed">{t.desc}</div>
+                        {t.status === 'IN PROGRESS' && (
+                          <div className="flex items-center gap-4 mt-2">
+                             <div className="text-[9px] font-mono text-slate-400 font-bold uppercase">{t.time}</div>
+                             <div className="text-[9px] font-bold uppercase text-green-500">{t.status}</div>
+                          </div>
+                        )}
                      </div>
                   </div>
                 </div>
@@ -272,7 +272,7 @@ export default function NoxDashboard() {
       {/* RIGHT SIDEBAR - CURRENT TASK & PROGRESS */}
       <div className="absolute right-6 top-[152px] bottom-6 w-[340px] flex flex-col z-40">
         <div className="flex justify-between items-end mb-2 px-2">
-          <div className="text-[12px] font-bold text-[#52525b] uppercase">Current Task</div>
+          <div className="text-[12px] font-bold text-[#52525b] uppercase tracking-wider">CURRENT TASK</div>
         </div>
 
         <div className="flex-1 overflow-hidden border-2 border-dashed border-[#B8BCCF]/80 rounded-xl flex flex-col bg-white/10 p-5">
@@ -292,7 +292,7 @@ export default function NoxDashboard() {
             </div>
           </div>
 
-          <div className="mb-6 ml-1 text-[12px] font-bold text-[#52525b] uppercase">Step Progress</div>
+          <div className="mb-6 ml-1 text-[12px] font-bold text-[#52525b] uppercase tracking-wider">STEP PROGRESS</div>
           
           <div className="flex-1 relative">
             <div className="flex flex-col gap-9 relative">
@@ -317,8 +317,10 @@ export default function NoxDashboard() {
                   </div>
                   <div className="flex-1 flex items-center justify-between min-w-0">
                     <div className="flex flex-col justify-center">
-                      <div className={`text-[12px] font-bold tracking-tight leading-none ${s.status === 'ACTIVE' ? 'text-red-500' : s.status === 'SKIPPED' ? 'text-slate-300' : 'text-[#1a2b4b]'}`}>{s.name}</div>
-                      <div className="text-[11px] text-[#52525b] mt-1.5 leading-none">{s.status === 'ACTIVE' ? s.desc : s.status === 'SKIPPED' ? 'Skipped' : 'Waiting...'}</div>
+                      <div className={`text-[12px] font-bold tracking-wider leading-none ${s.status === 'ACTIVE' ? 'text-red-500' : s.status === 'SKIPPED' ? 'text-slate-300' : 'text-[#1a2b4b]'}`}>
+                        {s.name}
+                      </div>
+                      <div className="text-[11px] text-[#52525b] mt-1.5 leading-none">{s.status === 'ACTIVE' ? s.desc : s.status === 'SKIPPED' ? 'Skipped' : 'Inactive'}</div>
                     </div>
                     {s.time && (
                       <div className="text-[10px] font-mono text-slate-400 font-bold ml-4">
