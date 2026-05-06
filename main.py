@@ -142,7 +142,6 @@ def get_system_context():
     return context
 
 def nox_say(text):
-    asyncio.run(broadcast_state(NoxState.SPEAKING))
     # Remove memory tags from speech
     clean_text = text.split("[MEMORY:")[0].split("###")[0].strip()
     print(f"NOX: {clean_text}")
@@ -161,9 +160,11 @@ def nox_say(text):
         subprocess.run(cmd_fx, shell=True, check=False)
         
         # 3. Play the FX WAV
+        asyncio.run(broadcast_state(NoxState.SPEAKING))
         subprocess.run(["afplay", EFFECT_WAV if os.path.exists(EFFECT_WAV) else TEMP_WAV])
     except Exception as e:
         print(f"Audio error: {e}")
+        asyncio.run(broadcast_state(NoxState.SPEAKING))
         subprocess.run(["say", "-v", "Serena", speech_text])
         
     asyncio.run(broadcast_state(NoxState.IDLE))

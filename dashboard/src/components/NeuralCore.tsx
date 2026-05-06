@@ -240,17 +240,23 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
       }
 
       const rawDelta = (now - lastTimeRef.current) / 16.66;
-      const dt = Math.min(rawDelta, 2.0);
+      const dt_stable = Math.min(rawDelta, 2.0);
       lastTimeRef.current = now;
+
+      // Dynamic Speed Multiplier ONLY for neurons
+      const targetSpeed = mode === "talking" ? 1.0 : mode === "thinking" ? 0.6 : 0.15;
+      if (!(window as any).noxSpeed) (window as any).noxSpeed = targetSpeed;
+      (window as any).noxSpeed += (targetSpeed - (window as any).noxSpeed) * 0.1;
+      const speedMult = (window as any).noxSpeed;
+      const dt_snakes = dt_stable * speedMult;
 
       ctx.clearRect(0, 0, size, size);
 
-      // 1. Ambient Light (Background atmosphere) - MUST BE FIRST
+      // 1. Ambient Light (Background atmosphere) - STABLE
       const breathing = Math.sin(now / 700) * 0.2;
       const shimmer = Math.sin(now / 30) * 0.03;
       const coreOpacity = 0.35 + breathing * 0.15 + shimmer;
-      const radiusPulse = size / 2 * (1.1 + breathing * 0.2);
-
+      
       const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
       grad.addColorStop(0, "rgba(0, 0, 0, 0.7)"); 
       grad.addColorStop(1, `rgba(65, 105, 225, ${coreOpacity * 0.5})`); 
@@ -259,20 +265,20 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
       // 3. Grid & Clock Ticks
       drawGrid();
 
-      // Spawn Ray Pulses every 5s
+      // Spawn Ray Pulses every 5s - STABLE
       if (now - lastRayPulseTimeRef.current > 5000) {
         rayPulsesRef.current.push(0);
         lastRayPulseTimeRef.current = now;
       }
 
-      // Update Ray Pulses
+      // Update Ray Pulses - STABLE
       rayPulsesRef.current = rayPulsesRef.current
-        .map(p => p + 0.015 * dt)
+        .map(p => p + 0.015 * dt_stable)
         .filter(p => p < 1);
 
-      // Update Cooldowns based on time
+      // Update Cooldowns based on dynamic time
       for (const key in cooldownsRef.current) {
-        if (cooldownsRef.current[key] > 0) cooldownsRef.current[key] -= dt;
+        if (cooldownsRef.current[key] > 0) cooldownsRef.current[key] -= dt_snakes;
       }
 
       const targetCount = 8;
@@ -280,10 +286,10 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         snakesRef.current.push(initSnake());
       }
 
-      // 1. Update Phase
+      // 1. Update Phase - DYNAMIC (Snakes)
       snakesRef.current.forEach((snake, sIdx) => {
-        snake.life += dt;
-        snake.progress += snake.speed * dt;
+        snake.life += dt_snakes;
+        snake.progress += snake.speed * dt_snakes;
 
         if (snake.progress >= 1) {
           const currentPos = snake.points[snake.points.length - 1];
@@ -423,7 +429,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         ctx.beginPath(); ctx.arc(pulse.x, pulse.y, 1.2, 0, Math.PI * 2); ctx.fill();
 
         ctx.restore();
-        pulse.alpha -= 0.14 * dt; // Even snappier for a "high-energy" feel
+        pulse.alpha -= 0.14 * dt_snakes; // Even snappier for a "high-energy" feel
       });
       pulsesRef.current = pulsesRef.current.filter(p => p.alpha > 0);
 

@@ -140,7 +140,8 @@ export default function NoxDashboard() {
     let raf: number;
     const start = performance.now();
     const tick = () => {
-      const t = (performance.now() - start) / 1000;
+      const now = performance.now();
+      const t = (now - start) / 1000;
       const stage = stageSizeRef.current;
       if (!stage) { raf = requestAnimationFrame(tick); return; }
 
