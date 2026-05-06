@@ -97,17 +97,30 @@ def process_command(text):
         nox_say("Сэр, мой мозг (Ollama) временно недоступен. Проверьте, запущен ли сервис.")
 
 def record_audio():
-    print("\n[СЛУШАЮ... Нажми Ctrl+C для выхода]")
+    # Dynamically find default device info
+    try:
+        device_info = sd.query_devices(kind='input')
+        current_fs = int(device_info['default_samplerate'])
+        print(f"\n[СЛУШАЮ: {device_info['name']} ({current_fs}Hz)... Нажми Ctrl+C для выхода]")
+    except Exception as e:
+        print(f"Audio Device Error: {e}")
+        return np.array([], dtype=np.float32)
+
     recording = []
     
     def callback(indata, frames, time, status):
+        if status:
+            print(f"SD Status: {status}")
         recording.append(indata.copy())
 
-    with sd.InputStream(samplerate=FS, channels=1, callback=callback):
-        # record for a fixed duration or until silence (simplified for now)
-        # For simplicity, we record in 5-second chunks if user is speaking
+    # Use device=None to follow system default
+    with sd.InputStream(samplerate=current_fs, channels=1, callback=callback, device=None):
+        # record for a fixed duration
         time.sleep(5) 
     
+    if not recording:
+        return np.array([], dtype=np.float32)
+        
     audio_data = np.concatenate(recording, axis=0)
     return audio_data.flatten()
 

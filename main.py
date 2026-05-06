@@ -75,9 +75,9 @@ def save_history(history):
 
 conversation_history = load_history() # Persistent memory
 
-# Load models (Upgraded to 'small' for accuracy)
-print("Loading Whisper model (small)...")
-stt_model = whisper.load_model("small")
+# Load models (Using 'base' for speed and reliability)
+print("Loading Whisper model (base)...")
+stt_model = whisper.load_model("base")
 
 async def broadcast_state(state: str):
     global current_state
@@ -102,11 +102,44 @@ async def websocket_endpoint(websocket: WebSocket):
         active_connections.remove(websocket)
 
 def get_system_context():
+    context = {"status": {}, "tasks": []}
     try:
-        with open(STATUS_FILE, 'r') as f:
-            return json.load(f)
-    except:
-        return {}
+        if os.path.exists(STATUS_FILE):
+            with open(STATUS_FILE, 'r') as f:
+                context["status"] = json.load(f)
+    except: pass
+    
+    try:
+        if os.path.exists(TASKS_FILE):
+            with open(TASKS_FILE, 'r') as f:
+                content = f.read()
+                # Simple parsing of '--- task X' blocks
+                tasks = content.split("--- task")
+                for t in tasks[1:]: # Skip preamble
+                    lines = t.strip().split("\n")
+                    action = "Unknown"
+                    for l in lines:
+                        if l.startswith("Action:"):
+                            action = l.replace("Action:", "").strip()
+                            break
+                    context["tasks"].append(action)
+    except: pass
+    
+    try:
+        # Read Architect Logs
+        arch_log = os.path.join(PROJECT_ROOT, "multi-agent/.runtime/cursor_architect.log")
+        if os.path.exists(arch_log):
+            with open(arch_log, 'r') as f:
+                context["architect_logs"] = f.readlines()[-5:]
+        
+        # Read Codex Logs
+        codex_log = os.path.join(PROJECT_ROOT, "multi-agent/.runtime/codex_developer_supervisor.log")
+        if os.path.exists(codex_log):
+            with open(codex_log, 'r') as f:
+                context["codex_logs"] = f.readlines()[-5:]
+    except: pass
+
+    return context
 
 def nox_say(text):
     asyncio.run(broadcast_state(NoxState.SPEAKING))
@@ -159,12 +192,20 @@ def process_voice_command(text, is_greeting=False):
     global conversation_history, is_awake
     
     # Check for Wake Word
+    text_lower = text.lower()
+    wake_triggers = ["wake up", "hey", "nox", "hello nox"]
+    
     if not is_awake and not is_greeting:
-        if "hey" in text.lower() and "nox" in text.lower():
+        if any(trigger in text_lower for trigger in wake_triggers):
             is_awake = True
-            text = text.lower().split("nox")[-1].strip() # Take everything after "Nox"
+            print("--- NOX IS NOW AWAKE ---")
+            # Try to catch the actual command if it follows the wake word
+            for trigger in wake_triggers:
+                if trigger in text_lower:
+                    text = text_lower.split(trigger)[-1].strip()
+                    break
             if not text:
-                text = "Hello" # Just wake up
+                text = "Hello, I am here." 
         else:
             return # Stay dormant
 
@@ -174,21 +215,19 @@ def process_voice_command(text, is_greeting=False):
     memory = load_memory()
     
     system_prompt = f"""
-You are NOX. Your master is Eugene.
+You are NOX, a sharp-witted AI assistant. Eugene is your creator.
 RULES:
-1. NOX is your name. Never use 'Master'. Vary your addressing: 'Sir', 'Eugene', or none.
-2. BREVITY: Max 3 short sentences. 
-3. WIT: Sharp, futuristic, slightly cynical British wit.
-4. LEARNING: If you learn something new, use [MEMORY: fact].
+1. Keep it simple and natural. No jargon.
+2. BREVITY: Max 2 short sentences. 
+3. PERSONALITY: Cool, direct, slightly sarcastic.
+4. FACTS: Use the provided data below to answer Eugene's questions about tasks and agents.
 
-LONG-TERM MEMORY:
-{json.dumps(memory, indent=2)}
-
-CURRENT DIRECTORY:
-{", ".join(files)}
-
-PIPELINE CONTEXT:
-{json.dumps(context, indent=2, ensure_ascii=False)}
+REAL-TIME DATA:
+- Tasks in Queue: {len(context['tasks'])}
+- Active Task: {context['status'].get('current_task', 'None')}
+- Agent Statuses: {", ".join([f"{a['role']}: {a['status']}" for a in context['status'].get('pipeline', [])])}
+- Recent Logs: { (context.get('architect_logs', []) + context.get('codex_logs', []))[-5:] }
+- Task List: {", ".join(context['tasks'][:5])}
 """
 
     if is_greeting:
@@ -226,76 +265,68 @@ def voice_loop():
     target_fs = 16000
     chunk_size = 1024
     silence_threshold = 0.01
-    silence_duration_limit = 1.5
+    silence_duration_limit = 1.0
     
-    try:
-        device_info = sd.query_devices(kind='input')
-        native_fs = int(device_info['default_samplerate'])
-        device_idx = device_info['index']
-        print(f"Audio: Using {device_info['name']} at {native_fs}Hz")
-    except Exception as e:
-        print(f"Audio Device Error: {e}")
-        return
-
     while is_running:
         try:
+            # Dynamically discover default device each time we start listening
+            try:
+                device_info = sd.query_devices(kind='input')
+                native_fs = int(device_info['default_samplerate'])
+                print(f"--- Audio Input: {device_info['name']} ({native_fs}Hz) ---")
+            except Exception as e:
+                print(f"Audio Device Error: {e}")
+                time.sleep(2)
+                continue
+
             asyncio.run(broadcast_state(NoxState.LISTENING if is_awake else NoxState.IDLE))
             
             audio_buffer = []
             silent_chunks = 0
             has_started_talking = False
             
-            # Open stream at native samplerate
-            with sd.InputStream(samplerate=native_fs, device=device_idx, channels=1, blocksize=chunk_size) as stream:
-                print("--- Listening... ---")
+            target_fs = 16000
+            # Use hardware resampling by requesting target_fs directly
+            with sd.InputStream(samplerate=target_fs, device=None, channels=1, blocksize=chunk_size) as stream:
+                print(f"--- Listening (16kHz, Ready for command)... ---")
                 while is_running:
                     data, _ = stream.read(chunk_size)
-                    audio_buffer.append(data)
+                    # CRITICAL: Always copy the data as sounddevice might reuse the buffer
+                    audio_buffer.append(data.copy())
                     
-                    # Normalization for silence detection
                     volume_norm = np.linalg.norm(data) / np.sqrt(len(data))
                     
-                    # DEBUG: Print volume if it's not silent
-                    if volume_norm > 0.001:
-                        # print(f"Vol: {volume_norm:.4f}", end="\r") # Optional debug
-                        pass
+                    # Periodic debug print for volume
+                    if len(audio_buffer) % 50 == 0:
+                        print(f"DEBUG: Current Vol: {volume_norm:.5f} (Target > 0.001)")
 
-                    if volume_norm > 0.005: # Lowered threshold
+                    if volume_norm > 0.001: # Extreme sensitivity
                         if not has_started_talking:
-                            print("--- Signal detected... ---")
+                            print(f"--- Signal detected (Vol: {volume_norm:.5f}) ---")
                         has_started_talking = True
                         silent_chunks = 0
                     elif has_started_talking:
                         silent_chunks += 1
                     
-                    if has_started_talking and (silent_chunks * chunk_size / native_fs) > silence_duration_limit:
-                        print("--- End of speech detected. ---")
+                    if has_started_talking and (silent_chunks * chunk_size / target_fs) > silence_duration_limit:
+                        print(f"--- End of speech detected. Captured {len(audio_buffer)} chunks. ---")
                         break
-                    if len(audio_buffer) * chunk_size / native_fs > 15: break 
+                    if len(audio_buffer) * chunk_size / target_fs > 15: break 
 
             if len(audio_buffer) > 0 and has_started_talking:
                 print("--- Transcribing... ---")
-                audio_full = np.concatenate(audio_buffer).flatten()
-                
-                # Optimized Resampling: Decimation if multiple of 16k, otherwise interpolation
-                if native_fs == 48000:
-                    audio_resampled = audio_full[::3].astype(np.float32)
-                elif native_fs == 32000:
-                    audio_resampled = audio_full[::2].astype(np.float32)
-                elif native_fs != target_fs:
-                    from scipy.interpolate import interp1d
-                    duration = len(audio_full) / native_fs
-                    time_old = np.linspace(0, duration, len(audio_full))
-                    time_new = np.linspace(0, duration, int(duration * target_fs))
-                    f = interp1d(time_old, audio_full, kind='linear')
-                    audio_resampled = f(time_new).astype(np.float32)
-                else:
-                    audio_resampled = audio_full
+                audio_resampled = np.concatenate(audio_buffer).flatten()
+
+                # Normalize audio to boost signal for Whisper
+                max_vol = np.max(np.abs(audio_resampled))
+                if max_vol > 0:
+                    audio_resampled = audio_resampled / max_vol
 
                 # DEBUG: Save recorded audio to check what Whisper sees
                 import soundfile as sf
                 sf.write('/tmp/nox_debug_input.wav', audio_resampled, target_fs)
 
+                # Use English as requested by user
                 result = stt_model.transcribe(audio_resampled, language='en')
                 text = result["text"].strip()
                 
@@ -314,8 +345,6 @@ async def start_nox():
     if not is_running:
         is_running = True
         threading.Thread(target=voice_loop, daemon=True).start()
-        # Initial greeting when started manually
-        threading.Thread(target=lambda: process_voice_command("", is_greeting=True), daemon=True).start()
         return {"status": "started"}
     return {"status": "already_running"}
 
