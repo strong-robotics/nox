@@ -240,27 +240,27 @@ export default function NoxDashboard() {
       {/* TASK QUEUE SIDEBAR */}
       <div className="absolute left-6 top-[152px] bottom-6 w-[340px] flex flex-col z-40">
         <div className="mb-2 ml-2 text-[12px] font-bold text-[#52525b] uppercase tracking-wider">TASK QUEUE</div>
-        
+
         <div className="flex-1 overflow-hidden border-2 border-dashed border-[#B8BCCF]/80 rounded-xl flex flex-col bg-white/10">
           <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
             <div className="flex flex-col">
               {TASKS.map((t, i) => (
                 <div key={t.id} className={`p-4 flex items-center ${i < TASKS.length - 1 ? 'border-b border-dashed border-[#B8BCCF]' : ''}`}>
                   <div className="flex items-center gap-4 w-full">
-                     {/* Task Number Only */}
-                     <div className="text-lg font-bold text-[#3D7BFF] min-w-[28px]">
-                        {t.id}
-                     </div>
-                     <div className="flex flex-col justify-center">
-                        <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">{t.title}</div>
-                        <div className="text-[11px] text-[#52525b] font-medium mt-0.5 leading-relaxed">{t.desc}</div>
-                        {t.status === 'IN PROGRESS' && (
-                          <div className="flex items-center gap-4 mt-2">
-                             <div className="text-[9px] font-mono text-slate-400 font-bold uppercase">{t.time}</div>
-                             <div className="text-[9px] font-bold uppercase text-green-500">{t.status}</div>
-                          </div>
-                        )}
-                     </div>
+                    {/* Task Number Only */}
+                    <div className="text-lg font-bold text-[#3D7BFF] min-w-[28px]">
+                      {t.id}
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">{t.title}</div>
+                      <div className="text-[11px] text-[#52525b] font-medium mt-0.5 leading-relaxed">{t.desc}</div>
+                      {t.status === 'IN PROGRESS' && (
+                        <div className="flex items-center gap-4 mt-2">
+                          <div className="text-[9px] font-mono text-slate-400 font-bold uppercase">{t.time}</div>
+                          <div className="text-[9px] font-bold uppercase text-green-500">{t.status}</div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -280,8 +280,8 @@ export default function NoxDashboard() {
           <div className="bg-white/70 rounded-xl p-4 mb-4 border border-white/50 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">01</div>
             <div className="flex flex-col">
-               <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">Create a red cube button widget</div>
-               <div className="text-[11px] text-[#52525b] mt-0.5">Flutter Stack</div>
+              <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">Create a red cube button widget</div>
+              <div className="text-[11px] text-[#52525b] mt-0.5">Flutter Stack</div>
             </div>
           </div>
 
@@ -293,12 +293,12 @@ export default function NoxDashboard() {
           </div>
 
           <div className="mb-6 ml-1 text-[12px] font-bold text-[#52525b] uppercase tracking-wider">STEP PROGRESS</div>
-          
+
           <div className="flex-1 relative">
             <div className="flex flex-col gap-9 relative">
               {/* Vertical Dashed Line - Ends at the last agent circle */}
               <div className="absolute left-[15px] top-4 bottom-4 border-l-[1.5px] border-dashed border-slate-300" />
-              
+
               {[
                 { n: 1, name: 'ARCHITECT', status: 'ACTIVE', time: '02:14:32', desc: 'Analyzing instructions...', color: '#FF5C5C' },
                 { n: 2, name: 'DESIGNER', status: 'SKIPPED', time: '', desc: 'Task skip: True', color: '#FFB547' },
@@ -306,11 +306,11 @@ export default function NoxDashboard() {
                 { n: 4, name: 'TESTER', status: 'SKIPPED', time: '', desc: 'Task skip: True', color: '#27D69E' },
               ].map((s) => (
                 <div key={s.n} className="flex items-center gap-4 relative">
-                  <div 
+                  <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold z-10 transition-all ${s.status === 'ACTIVE' ? 'text-white shadow-lg scale-110' : s.status === 'SKIPPED' ? 'text-white/60' : 'text-white'}`}
-                    style={{ 
+                    style={{
                       backgroundColor: s.color,
-                      boxShadow: s.status === 'ACTIVE' ? `0 4px 14px ${s.color}88` : `0 2px 8px ${s.color}44`
+                      boxShadow: `0 4px 10px ${s.color}33`
                     }}
                   >
                     {s.n}
@@ -395,6 +395,42 @@ export default function NoxDashboard() {
             );
           })}
         </div>
+      </div>
+      {/* SYSTEM FLOOR (BOTTOM STATUS) */}
+      <div className="absolute bottom-6 left-[388px] right-[388px] h-[88px] bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] z-40 flex items-center px-12 justify-between border border-white/50">
+
+        {/* ACTIVE */}
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
+            1
+          </div>
+          <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">ACTIVE</div>
+        </div>
+
+        {/* COMPLETED */}
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
+            3
+          </div>
+          <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">COMPLETED</div>
+        </div>
+
+        {/* QUEUED */}
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
+            5
+          </div>
+          <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">QUEUED</div>
+        </div>
+
+        {/* TOTAL */}
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
+            9
+          </div>
+          <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">TOTAL</div>
+        </div>
+
       </div>
     </main>
   );
