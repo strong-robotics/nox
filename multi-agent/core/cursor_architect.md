@@ -28,6 +28,8 @@ Unlike Antigravity (Gemini), Claude Code cannot run a blocking Python process in
 The Bash tool auto-backgrounds long commands and has a 10-minute hard limit.
 **Solution: use the Monitor tool (persistent: true) as a drop-in replacement for all blocking wait scripts.**
 
+**⚠️ ZSH WARNING**: In Monitor command scripts, NEVER use `status` as a variable name — it is read-only in zsh and will cause `exit 1`. Use role-specific names: `tester_status`, `developer_status`, `designer_status`, etc. Always add `|| true` after python3 calls to prevent transient errors from killing the loop.
+
 ## 📋 LOGGING (CURSOR-SPECIFIC)
 After each key event below, run the corresponding Bash log command.
 Log file: `multi-agent/.runtime/cursor_architect.log`
@@ -70,8 +72,8 @@ After writing status.json with `Designer: ready` or `Developer: ready` when Test
 Monitor(
   persistent=true,
   command="while true; do
-    status=$(python3 -c \"import json; d=json.load(open('multi-agent/status.json')); print(next(r['status'] for r in d['pipeline'] if r['role']=='Tester'))\" 2>/dev/null)
-    [ \"$status\" = 'completed' ] && echo 'TESTER_DONE' && exit 0
+    tester_status=$(python3 -c \"import json; d=json.load(open('multi-agent/status.json')); print(next(r['status'] for r in d['pipeline'] if r['role']=='Tester'))\" 2>/dev/null) || true
+    [ \"$tester_status\" = 'completed' ] && echo 'TESTER_DONE' && exit 0
     sleep 3
   done"
 )

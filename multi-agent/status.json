@@ -1,12 +1,40 @@
 {
     "project": "Project Name",
-    "last_updated": "2026-05-03T23:13:00Z",
-    "run_id": "run_20260503_231300",
+    "last_updated": "2026-05-07T09:18:08Z",
+    "run_id": "run_20260507_091808",
     "pipeline": [
-        { "role": "Architect", "status": "waiting", "started_at": null, "completed_at": null, "description": "Polling multi-agent.tasks.txt", "chat_name": "Cursor Architect" },
-        { "role": "Designer", "status": "waiting", "started_at": null, "completed_at": null, "description": "Waiting...", "chat_name": "Designer" },
-        { "role": "Developer", "status": "waiting", "started_at": null, "completed_at": null, "description": "Waiting...", "chat_name": "Developer" },
-        { "role": "Tester", "status": "waiting", "started_at": null, "completed_at": null, "description": "Waiting...", "chat_name": "Tester", "qa_attempts": 0 }
+        {
+            "role": "Architect",
+            "status": "waiting",
+            "started_at": null,
+            "completed_at": null,
+            "description": "Polling multi-agent.tasks.txt",
+            "chat_name": "Cursor Architect"
+        },
+        {
+            "role": "Designer",
+            "status": "waiting",
+            "started_at": null,
+            "completed_at": null,
+            "description": "Waiting...",
+            "chat_name": "Designer"
+        },
+        {
+            "role": "Developer",
+            "status": "waiting",
+            "started_at": null,
+            "completed_at": null,
+            "description": "Waiting...",
+            "chat_name": "Developer"
+        },
+        {
+            "role": "Tester",
+            "status": "waiting",
+            "started_at": null,
+            "completed_at": null,
+            "description": "Waiting...",
+            "chat_name": "Tester"
+        }
     ],
     "current_task": "None"
 }

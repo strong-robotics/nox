@@ -70,6 +70,9 @@ PROMPT="COMMAND: RESUME ROLE [$ROLE_NAME - CODEX EXTERNAL SUPERVISOR].
 5. After you finish this role step and update pipeline state/artifacts, STOP SILENTLY. The external supervisor will restart \`$WAIT_COMMAND\`.
 6. OBSERVE 'BLOOD SILENT' MANDATE for user chat: NO chat, NO summaries, NO reports. Completion is signaled only through files/status. If assistant text is unavoidable, output ONLY \`NO_REPLY\`."
 
+mkdir -p "$ROOT_DIR/multi-agent/.runtime"
+echo $$ > "$ROOT_DIR/multi-agent/.runtime/codex_${ROLE}_supervisor.pid"
+
 echo "[SUPERVISOR] Starting Codex $ROLE loop (workspace-write sandbox)"
 echo "[SUPERVISOR] Project root: $ROOT_DIR"
 echo "[SUPERVISOR] Wait command: $WAIT_COMMAND"

@@ -58,3 +58,7 @@ next-env.d.ts
 # other
 test/
 design/
+
+# runtime
+multi-agent/.runtime/
+/multi-agent/.runtime/

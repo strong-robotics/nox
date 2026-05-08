@@ -17,13 +17,18 @@ Unlike Antigravity (Gemini), Claude Code cannot run a blocking Python process in
 The Bash tool auto-backgrounds long commands and has a 10-minute hard limit.
 **Solution: use the Monitor tool (persistent: true) as a drop-in replacement for all blocking wait scripts.**
 
+### STARTUP — Write PID file (run once before Step 1):
+```bash
+mkdir -p multi-agent/.runtime && ps -ef | grep "native-binary/claude" | grep -v grep | awk '{print $2}' | tail -1 > multi-agent/.runtime/cursor_tester.pid
+```
+
 ### STEP 1 — Wait for Tester ready (replaces `cursor_wait_for_status.py Tester ready`):
 ```
 Monitor(
   persistent=true,
   command="while true; do
-    status=$(python3 -c \"import json; d=json.load(open('multi-agent/status.json')); print(next(r['status'] for r in d['pipeline'] if r['role']=='Tester'))\" 2>/dev/null)
-    [ \"$status\" = 'ready' ] && echo 'TESTER_READY' && exit 0
+    tester_status=$(python3 -c \"import json; d=json.load(open('multi-agent/status.json')); print(next(r['status'] for r in d['pipeline'] if r['role']=='Tester'))\" 2>/dev/null) || true
+    [ \"$tester_status\" = 'ready' ] && echo 'TESTER_READY' && exit 0
     sleep 3
   done"
 )

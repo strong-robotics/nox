@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import NeuralCore from "@/components/NeuralCore";
 
 // --- CONFIGURATION ---
@@ -22,8 +22,6 @@ const TASKS = [
 const RING_DIAMETER = 0.403;
 const RING_THICKNESS = 0.008;
 const DASH_DIAMETER = 0.533;
-const TILE_RADIUS = DASH_DIAMETER / 2;
-const NODE_RADIUS = 0.228;
 const ARROW_INNER = 0.142;
 const ARROW_LEN = 0.045;
 
@@ -62,40 +60,61 @@ function Icon({ kind }: { kind: string }) {
 }
 
 function AgentStatusCard({ agent }: { agent: typeof AGENTS[0] }) {
-  const isActive = agent.status === "ACTIVE";
+  const [stopping, setStopping] = useState(false);
+  const isActive  = agent.status === "ACTIVE";
+  const isWaiting = agent.status === "WAITING";
+  const isLive    = isActive || isWaiting;
+  const dotColor  = stopping ? "bg-red-400 animate-pulse" : isActive ? "bg-green-400" : isWaiting ? "bg-yellow-400 animate-pulse" : "bg-slate-300";
+  const textColor = stopping ? "text-red-400" : isActive ? "text-green-500" : isWaiting ? "text-yellow-500" : "text-slate-400";
+  const statusLabel = stopping ? "STOPPING" : agent.status;
+
+  const handleStop = async () => {
+    const agentId = (agent as any).agentId ?? (agent as any).pid;
+    if (!agentId) return;
+    setStopping(true);
+    await fetch("http://localhost:777/kill-agent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pid: agentId, role: agent.id }),
+    }).catch(() => {});
+    setStopping(false);
+  };
+
   return (
     <div className="bg-white rounded-xl p-5 flex-1 shadow-[0_4px_16px_rgba(0,0,0,0.06)] flex items-center gap-4 min-w-[220px]">
-      <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white" style={{ background: `linear-gradient(135deg, ${agent.gradFrom}, ${agent.gradTo})` }}>
+      <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${agent.gradFrom}, ${agent.gradTo})` }}>
         <Icon kind={agent.icon} />
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 flex-1 min-w-0">
         <div className="flex flex-col">
           <div className="text-[12px] font-bold text-[#1a2b4b] tracking-wider uppercase">{agent.label}</div>
           <div className="text-[10px] text-[#52525b] font-medium">{agent.model}</div>
         </div>
         <div className="flex items-center gap-3 mt-1">
           <div className="flex items-center gap-1.5">
-            <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-green-400' : 'bg-slate-300'}`} />
-            <div className={`text-[9px] font-bold uppercase ${isActive ? 'text-green-500' : 'text-slate-400'}`}>{agent.status}</div>
+            <div className={`w-1.5 h-1.5 rounded-full ${dotColor} ${isWaiting ? 'animate-pulse' : ''}`} />
+            <div className={`text-[9px] font-bold uppercase ${textColor}`}>{statusLabel}</div>
           </div>
+          {isLive && ((agent as any).agentId || (agent as any).pid) && (
+            <div className="text-[9px] font-mono text-slate-400">#{(agent as any).agentId ?? (agent as any).pid}</div>
+          )}
         </div>
       </div>
+      {isLive && ((agent as any).pid || (agent as any).agentId) && (
+        <button
+          onClick={handleStop}
+          title="Stop agent"
+          className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center bg-red-50 hover:bg-red-100 transition-colors"
+        >
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="#ef4444">
+            <rect x="1" y="1" width="8" height="8" rx="1.5" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
 
-
-function NoxBrainIcon({ state }: { state: string }) {
-  const isPulse = state === "listening" || state === "processing";
-  const isSpeak = state === "speaking";
-  return (
-    <svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke={isSpeak ? "#3D7BFF" : "#5340B8"} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={`transition-all duration-500 ${isSpeak ? 'scale-110 drop-shadow-[0_0_10px_rgba(61,123,255,0.5)]' : 'scale-100'}`}>
-      <path d="M22 10c-3 0-5 2-5 4.5 0 .4.05.8.13 1.16C15.3 16.4 14 18 14 20c0 1 .3 1.9.8 2.6-.5.7-.8 1.6-.8 2.6 0 1.6.85 3 2.1 3.7-.07.4-.1.8-.1 1.2 0 2.5 2 4.5 4.5 4.5 1 0 1.9-.32 2.6-.86V10.86A4.46 4.46 0 0 0 22 10Z" />
-      <path d="M26 10c3 0 5 2 5 4.5 0 .4-.05.8-.13 1.16C32.7 16.4 34 18 34 20c0 1-.3 1.9-.8 2.6.5.7.8 1.6.8 2.6 0 1.6-.85 3-2.1 3.7.07.4.1.8.1 1.2 0 2.5-2 4.5-4.5 4.5-1 0-1.9-.32-2.6-.86V10.86A4.46 4.46 0 0 1 26 10Z" />
-      <path d="M19 18.5h2M27 18.5h2M19 25h3M26 25h3M21 31h6" opacity={isSpeak ? 1 : 0.6} />
-    </svg>
-  );
-}
 
 
 
@@ -114,13 +133,103 @@ export default function NoxDashboard() {
   const tileRefs = useRef<Record<string, { wrap: HTMLDivElement | null; card: HTMLDivElement | null; halo: HTMLDivElement | null }>>({});
   const arrowRefs = useRef<Record<string, { wrap: HTMLDivElement | null; line: HTMLDivElement | null; head: HTMLDivElement | null }>>({});
 
+  const [fullState, setFullState] = useState<any>(null);
+  const agentsRef = useRef<any[]>([]);
+
   useEffect(() => {
     setMounted(true);
     const ws = new WebSocket("ws://localhost:777/ws");
-    ws.onmessage = (e) => { const data = JSON.parse(e.data); if (data.state) setState(data.state); };
+    ws.onmessage = (e) => { 
+      const data = JSON.parse(e.data); 
+      if (data.state) setState(data.state);
+      setFullState(data);
+    };
     fetch("http://localhost:777/start", { method: "POST" }).catch(() => { });
     return () => ws.close();
   }, []);
+
+  const AGENT_META: Record<string, any> = {
+    architect: { label: "ARCHITECT", angle: 0, color: "#FF5C5C", gradFrom: "#FF8E8E", gradTo: "#FF5C5C", icon: "architect" },
+    designer: { label: "DESIGNER", angle: -90, color: "#FFB547", gradFrom: "#FFCC85", gradTo: "#FFB547", icon: "designer" },
+    developer: { label: "DEVELOPER", angle: 90, color: "#7C5CFF", gradFrom: "#A08EFF", gradTo: "#7C5CFF", icon: "developer" },
+    tester: { label: "TESTER", angle: 180, color: "#27D69E", gradFrom: "#3BE3AC", gradTo: "#27D69E", icon: "tester" },
+  };
+
+  const resolveAgentStatus = (pipelineStatus: string, role: string): string => {
+    if (pipelineStatus === "in_progress") return "ACTIVE";
+    if (pipelineStatus === "completed")   return "DONE";
+    if (pipelineStatus === "ready")       return "READY";
+    if (pipelineStatus === "waiting") {
+      const liveAgents: any[] = fullState?.live_agents || [];
+      const isAlive = liveAgents.some(
+        (a: any) => a.role.toLowerCase() === role.toLowerCase() && a.alive
+      );
+      return isAlive ? "WAITING" : "INACTIVE";
+    }
+    return "INACTIVE";
+  };
+
+  const currentAgents = useMemo(() => {
+    if (!fullState || !fullState.pipeline || fullState.pipeline.length === 0) return AGENTS;
+    const resolvedStatus = (p: any) => resolveAgentStatus(p.status, p.role);
+
+    const resolveModel = (p: any): string => {
+      const status = resolvedStatus(p);
+      if (status === "INACTIVE") return "—";
+      const role = p.role.toLowerCase();
+      const liveAgents: any[] = fullState?.live_agents || [];
+      const liveAgent = liveAgents.find(
+        (a: any) => a.role.toLowerCase() === role && a.alive
+      );
+      const env = liveAgent?.env;
+      if (role === "architect") return env === "antigravity" ? "Gemini" : "Claude";
+      if (role === "developer") {
+        if (env === "antigravity") return "Gemini";
+        if (env === "cursor") return "Claude";
+        if (env === "codex") {
+          const m = (fullState.codex_agents || []).find((a: any) => a.role === "developer")?.model;
+          return m && m !== "unknown" ? m : "Codex";
+        }
+        return "Codex";
+      }
+      if (role === "designer" || role === "tester") return env === "cursor" ? "Claude" : "Gemini";
+      return "—";
+    };
+
+    const liveAgentsAll: any[] = fullState?.live_agents || [];
+    return fullState.pipeline.map((p: any) => {
+      const meta = AGENT_META[p.role.toLowerCase()] || { label: p.role.toUpperCase(), angle: 0, color: "#7C5CFF", gradFrom: "#A08EFF", gradTo: "#7C5CFF", icon: "developer" };
+      const liveAgent = liveAgentsAll.find(
+        (a: any) => a.role.toLowerCase() === p.role.toLowerCase() && a.alive
+      );
+      return {
+        id: p.role,
+        ...meta,
+        status: resolvedStatus(p),
+        model: resolveModel(p),
+        time: p.started_at || "",
+        pid: liveAgent?.pid ?? null,
+        agentId: liveAgent?.kill_pid ?? null,
+      };
+    });
+  }, [fullState]);
+
+  useEffect(() => {
+    agentsRef.current = currentAgents;
+  }, [currentAgents]);
+
+  const isActiveTask = !!(fullState?.current_task && fullState.current_task !== "None" && fullState.current_task !== "N/A");
+
+  const currentTasks = useMemo(() => {
+    if (!fullState || !fullState.tasks || !fullState.tasks.all_queued?.length) return TASKS;
+    return fullState.tasks.all_queued.map((t: any, i: number) => ({
+      id: `0${i + 1}`,
+      title: t.action || t,
+      desc: t.stack ? `${t.stack} Stack` : "Queued",
+      status: isActiveTask && i === 0 ? "IN PROGRESS" : "QUEUED",
+      color: isActiveTask && i === 0 ? "#FF5C5C" : "#7C5CFF"
+    }));
+  }, [fullState, isActiveTask]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -149,11 +258,10 @@ export default function NoxDashboard() {
       const dashSpeed = 240;
       const dashDVal = stage * DASH_DIAMETER;
       const baseR = (dashDVal - 1.5) / 2; // Center of the 1.5px dashed border
-      const nodeRadiusVal = stage * NODE_RADIUS;
       const orbitRot = (t * 360) / orbitPeriod;
 
       // Tiles & Halos
-      AGENTS.forEach((a) => {
+      agentsRef.current.forEach((a: any) => {
         const refs = tileRefs.current[a.id];
         if (!refs || !refs.wrap) return;
         const phase = (a.angle * Math.PI) / 180;
@@ -209,8 +317,6 @@ export default function NoxDashboard() {
   const outerR = ringD / 2;
   const arrowInner = stageSize * ARROW_INNER;
   const arrowLen = stageSize * ARROW_LEN;
-  const nodeR = stageSize * NODE_RADIUS;
-
   if (!mounted) return <main className="min-h-screen bg-[#F4F5F8]" />;
 
   return (
@@ -232,7 +338,7 @@ export default function NoxDashboard() {
       {/* HEADER BLOCK (Absolute) */}
       <div className="absolute top-6 left-6 right-6 h-fit flex items-center gap-4 z-50 pointer-events-none">
         <div className="flex gap-4 w-full pointer-events-auto">
-          {AGENTS.map((a) => (
+          {currentAgents.map((a: any) => (
             <AgentStatusCard key={a.id} agent={a} />
           ))}
         </div>
@@ -245,26 +351,28 @@ export default function NoxDashboard() {
         <div className="flex-1 overflow-hidden border-2 border-dashed border-[#B8BCCF]/80 rounded-xl flex flex-col bg-white/10">
           <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
             <div className="flex flex-col">
-              {TASKS.map((t, i) => (
-                <div key={t.id} className={`p-4 flex items-center ${i < TASKS.length - 1 ? 'border-b border-dashed border-[#B8BCCF]' : ''}`}>
+              {currentTasks.length > 0 ? currentTasks.map((t: any, i: number) => (
+                <div key={t.id} className={`p-4 flex items-center ${i < currentTasks.length - 1 ? 'border-b border-dashed border-[#B8BCCF]' : ''}`}>
                   <div className="flex items-center gap-4 w-full">
-                    {/* Task Number Only */}
-                    <div className="text-lg font-bold text-[#3D7BFF] min-w-[28px]">
-                      {t.id}
-                    </div>
+                    <div className="text-lg font-bold text-[#3D7BFF] min-w-[28px]">{t.id}</div>
                     <div className="flex flex-col justify-center">
                       <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">{t.title}</div>
                       <div className="text-[11px] text-[#52525b] font-medium mt-0.5 leading-relaxed">{t.desc}</div>
                       {t.status === 'IN PROGRESS' && (
                         <div className="flex items-center gap-4 mt-2">
-                          <div className="text-[9px] font-mono text-slate-400 font-bold uppercase">{t.time}</div>
+                          <div className="text-[9px] font-mono text-slate-400 font-bold uppercase">{t.time || "Active"}</div>
                           <div className="text-[9px] font-bold uppercase text-green-500">{t.status}</div>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="flex flex-col items-center justify-center h-full py-20 px-6 text-center opacity-40">
+                  <div className="text-[11px] font-bold text-[#1a2b4b] uppercase tracking-[0.2em] mb-2">Idle System</div>
+                  <div className="text-[10px] text-[#52525b] leading-relaxed">Eugene, I'm standing by. Add a task to the queue to begin.</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -278,20 +386,34 @@ export default function NoxDashboard() {
 
         <div className="flex-1 overflow-hidden border-2 border-dashed border-[#B8BCCF]/80 rounded-xl flex flex-col bg-white/10 p-5">
           {/* Main Task Highlight */}
-          <div className="bg-white/70 rounded-xl p-4 mb-4 border border-white/50 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">01</div>
-            <div className="flex flex-col">
-              <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">Create a red cube button widget</div>
-              <div className="text-[11px] text-[#52525b] mt-0.5">Flutter Stack</div>
-            </div>
-          </div>
-
-          {/* Multiline Task Description */}
-          <div className="px-1 mb-8">
-            <div className="text-[12px] leading-relaxed text-[#52525b]">
-              Create test/red_cube_button.dart with a StatelessWidget called RedCubeButton. It's a 80x80 red square (BoxDecoration, color: Colors.red) that prints "Red pressed" to console on tap. No external dependencies.
-            </div>
-          </div>
+          {(() => {
+            const queued = fullState?.tasks?.all_queued || [];
+            const activeTask = isActiveTask
+              ? (queued.find((t: any) => t.action === fullState.current_task) || null)
+              : null;
+            return (
+              <>
+                <div className="bg-white/70 rounded-xl p-4 mb-4 border border-white/50 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg ${isActiveTask ? "bg-blue-50 text-[#3D7BFF]" : "bg-slate-100 text-slate-400"}`}>
+                    {isActiveTask ? "▶" : "—"}
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">
+                      {isActiveTask ? fullState.current_task : "No Active Task"}
+                    </div>
+                    <div className="text-[11px] text-[#52525b] mt-0.5">
+                      {isActiveTask ? "Active Multi-Agent Stream" : "Idle"}
+                    </div>
+                  </div>
+                </div>
+                {isActiveTask && activeTask?.instructions && (
+                  <div className="px-1 mb-6">
+                    <div className="text-[12px] leading-relaxed text-[#52525b]">{activeTask.instructions}</div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           <div className="mb-6 ml-1 text-[12px] font-bold text-[#52525b] uppercase tracking-wider">STEP PROGRESS</div>
 
@@ -300,28 +422,24 @@ export default function NoxDashboard() {
               {/* Vertical Dashed Line - Ends at the last agent circle */}
               <div className="absolute left-[15px] top-4 bottom-4 border-l-[1.5px] border-dashed border-slate-300" />
 
-              {[
-                { n: 1, name: 'ARCHITECT', status: 'ACTIVE', time: '02:14:32', desc: 'Analyzing instructions...', color: '#FF5C5C' },
-                { n: 2, name: 'DESIGNER', status: 'SKIPPED', time: '', desc: 'Task skip: True', color: '#FFB547' },
-                { n: 3, name: 'DEVELOPER', status: 'WAITING', time: '', desc: 'Waiting for design', color: '#7C5CFF' },
-                { n: 4, name: 'TESTER', status: 'SKIPPED', time: '', desc: 'Task skip: True', color: '#27D69E' },
-              ].map((s) => (
-                <div key={s.n} className="flex items-center gap-4 relative">
+              {currentAgents.map((s: any, i: number) => (
+                <div key={s.id} className="flex items-center gap-4 relative">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold z-10 transition-all ${s.status === 'ACTIVE' ? 'text-white shadow-lg scale-110' : s.status === 'SKIPPED' ? 'text-white/60' : 'text-white'}`}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold z-10 transition-all ${s.status === 'ACTIVE' ? 'text-white shadow-lg scale-110' : 'text-white'}`}
                     style={{
                       backgroundColor: s.color,
-                      boxShadow: `0 4px 10px ${s.color}33`
+                      boxShadow: s.status === 'ACTIVE' ? `0 4px 10px ${s.color}33` : 'none',
+                      opacity: s.status === 'COMPLETED' ? 0.6 : 1
                     }}
                   >
-                    {s.n}
+                    {i + 1}
                   </div>
                   <div className="flex-1 flex items-center justify-between min-w-0">
                     <div className="flex flex-col justify-center">
-                      <div className={`text-[12px] font-bold tracking-wider leading-none ${s.status === 'ACTIVE' ? 'text-red-500' : s.status === 'SKIPPED' ? 'text-slate-300' : 'text-[#1a2b4b]'}`}>
-                        {s.name}
+                      <div className={`text-[12px] font-bold tracking-wider leading-none ${s.status === 'ACTIVE' ? 'text-red-500' : 'text-[#1a2b4b]'}`}>
+                        {s.label}
                       </div>
-                      <div className="text-[11px] text-[#52525b] mt-1.5 leading-none">{s.status === 'ACTIVE' ? s.desc : s.status === 'SKIPPED' ? 'Skipped' : 'Inactive'}</div>
+                      <div className="text-[11px] text-[#52525b] mt-1.5 leading-none">{s.status === 'ACTIVE' ? (s.desc || "Processing...") : s.status}</div>
                     </div>
                     {s.time && (
                       <div className="text-[10px] font-mono text-slate-400 font-bold ml-4">
@@ -372,14 +490,14 @@ export default function NoxDashboard() {
             );
           })()}
 
-          {AGENTS.map((a) => (
+          {currentAgents.map((a: any) => (
             <div key={a.id + "-arrow"} ref={el => { if (el) arrowRefs.current[a.id] = { ...arrowRefs.current[a.id], wrap: el }; }} className="absolute left-1/2 top-1/2 w-0 h-0 will-change-transform">
               <div ref={el => { if (el && arrowRefs.current[a.id]) arrowRefs.current[a.id].line = el; }} className="arrow-line" style={{ left: arrowInner, width: arrowLen, background: `linear-gradient(90deg, ${a.color}00, ${a.color}cc)` }} />
               <div ref={el => { if (el && arrowRefs.current[a.id]) arrowRefs.current[a.id].head = el; }} className="arrow-head" style={{ left: arrowInner - 7, borderLeftColor: a.color }} />
             </div>
           ))}
 
-          {AGENTS.map((a) => {
+          {currentAgents.map((a: any) => {
             const ensureRef = () => { if (!tileRefs.current[a.id]) tileRefs.current[a.id] = { wrap: null, card: null, halo: null }; };
             return (
               <div key={a.id} ref={el => { ensureRef(); tileRefs.current[a.id].wrap = el; }} className="tile-wrap">
@@ -403,7 +521,7 @@ export default function NoxDashboard() {
         {/* ACTIVE */}
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
-            1
+            {fullState ? (fullState.pipeline || []).filter((a:any) => a.status === 'in_progress').length : "--"}
           </div>
           <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">ACTIVE</div>
         </div>
@@ -411,7 +529,7 @@ export default function NoxDashboard() {
         {/* COMPLETED */}
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
-            3
+            {fullState ? (fullState.tasks?.completed || 0) : "--"}
           </div>
           <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">COMPLETED</div>
         </div>
@@ -419,7 +537,7 @@ export default function NoxDashboard() {
         {/* QUEUED */}
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
-            5
+            {fullState ? (fullState.tasks?.queued || 0) : "--"}
           </div>
           <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">QUEUED</div>
         </div>
@@ -427,7 +545,7 @@ export default function NoxDashboard() {
         {/* TOTAL */}
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
-            9
+            {fullState ? (fullState.tasks?.completed || 0) + (fullState.tasks?.queued || 0) : "--"}
           </div>
           <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">TOTAL</div>
         </div>
