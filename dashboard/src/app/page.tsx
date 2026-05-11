@@ -78,7 +78,7 @@ function AgentStatusCard({ agent }: { agent: any }) {
 
       <div className="flex flex-col gap-0.5 flex-1 min-w-0 z-10">
         <div className="flex justify-between items-start">
-          <div className={`text-[13px] font-bold leading-tight tracking-wide uppercase ${statusColor} ${glowClass}`}>{agent.label}</div>
+          <div className={`text-[13px] font-bold text-[#00FF41] leading-tight tracking-wide uppercase ${glowClass}`}>{agent.label}</div>
           {isLive && (agent.agentId || agent.pid) && (
             <div className="text-[11px] font-mono text-[#00FF41]/40">#{agent.agentId ?? agent.pid}</div>
           )}
@@ -336,12 +336,12 @@ export default function NoxDashboard() {
       <div className="absolute left-6 top-[140px] bottom-10 w-[320px] flex flex-col z-40">
         <div className="mb-2 px-2 text-[10px] font-bold text-[#00FF41] uppercase tracking-[0.3em] matrix-text-glow">SYSTEM.QUEUE //</div>
         <div className="matrix-notched-new flex-1 overflow-hidden bg-black/60 backdrop-blur-md flex flex-col">
-          <div className="flex-1 overflow-y-auto custom-scrollbar z-10 p-5">
+          <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] z-10 p-5">
             {currentTasks.map((t: any, i: number) => (
-              <div key={t.id} className={`p-4 flex flex-col gap-1 border-b border-[#00FF41]/10 hover:bg-[#00FF41]/5 transition-colors cursor-default`}>
+              <div key={t.id} className={`p-4 flex flex-col gap-1 border-b border-[#00FF41]/10`}>
                 <div className="flex items-center gap-3">
                   <span className="text-[11px] text-[#00FF41]/60 font-mono">{t.id}</span>
-                  <span className={`text-[13px] font-bold tracking-wider ${t.status === 'IN PROGRESS' ? 'text-[#00FF41] matrix-text-glow' : 'text-[#00FF41]/40'}`}>{t.title}</span>
+                  <span className={`text-[13px] font-bold tracking-wider text-[#00FF41] ${t.status === 'IN PROGRESS' ? 'matrix-text-glow' : ''}`}>{t.title}</span>
                 </div>
                 <div className="flex justify-between items-center ml-6">
                   <span className="text-[11px] text-[#00FF41]/30 uppercase tracking-tighter">{t.desc}</span>
@@ -457,7 +457,7 @@ export default function NoxDashboard() {
                       <Icon kind={a.icon} />
                     </div>
                   </div>
-                  <span className="text-[13px] font-bold text-[#00FF41] leading-tight tracking-wide uppercase">{a.label}</span>
+                  <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-[#00FF41]/70">{a.label}</span>
                 </div>
               </div>
             );
