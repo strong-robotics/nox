@@ -63,29 +63,31 @@ function AgentStatusCard({ agent }: { agent: any }) {
   const isWaiting = agent.status === "WAITING";
   const isLive = isActive || isWaiting;
 
-  const statusColor = isActive ? "text-[#00FF41]" : isWaiting ? "text-yellow-400" : "text-gray-600";
+  const statusColor = isActive ? "text-[#00FF41]" : isWaiting ? "text-yellow-400" : "text-[#00FF41]/30";
   const glowClass = isActive ? "matrix-glow" : "";
 
   return (
-    <div className={`matrix-card relative flex-1 p-4 border border-[#00FF41]/20 flex items-center gap-4 overflow-hidden group`}>
+    <div className={`matrix-notched-new relative flex-1 h-[105px] min-h-[105px] p-5 flex items-center gap-4 overflow-hidden group ${isActive ? 'shadow-[0_0_20px_rgba(0,255,65,0.15)]' : ''}`}>
       {/* Scanline overlay for the card */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00FF41]/5 to-transparent bg-[length:100%_4px] pointer-events-none opacity-20" />
 
-      <div className={`w-10 h-10 rounded border border-[#00FF41]/40 flex items-center justify-center text-[#00FF41] flex-shrink-0 bg-black/40 ${isActive ? 'shadow-[0_0_10px_rgba(0,255,65,0.3)]' : ''}`}>
+      {/* Inner Icon Box - Rounded per example */}
+      <div className={`w-10 h-10 rounded-md border border-[#00FF41]/40 flex items-center justify-center text-[#00FF41] flex-shrink-0 bg-black/40 ${isActive ? 'shadow-[0_0_12px_rgba(0,255,65,0.25)]' : ''}`}>
         <Icon kind={agent.icon} />
       </div>
 
       <div className="flex flex-col gap-0.5 flex-1 min-w-0 z-10">
         <div className="flex justify-between items-start">
-          <div className={`text-[11px] font-bold tracking-[0.2em] uppercase ${statusColor} ${glowClass}`}>{agent.label}</div>
+          <div className={`text-[13px] font-bold leading-tight tracking-wide uppercase ${statusColor} ${glowClass}`}>{agent.label}</div>
           {isLive && (agent.agentId || agent.pid) && (
-            <div className="text-[9px] font-mono text-[#00FF41]/40">#{agent.agentId ?? agent.pid}</div>
+            <div className="text-[11px] font-mono text-[#00FF41]/40">#{agent.agentId ?? agent.pid}</div>
           )}
         </div>
-        <div className="text-[10px] text-gray-400 truncate">{agent.model} {agent.env ? `[${agent.env}]` : ""}</div>
+        <div className="text-[13px] text-[#00FF41]/40 truncate">{agent.model || "—"}</div>
+        <div className="text-[12px] text-[#00FF41]/50 tracking-wider">[{agent.env || ""}]</div>
         <div className="flex items-center gap-2 mt-1">
-          <div className={`w-1 h-1 rounded-full ${isActive ? 'bg-[#00FF41] animate-pulse shadow-[0_0_5px_#00FF41]' : isWaiting ? 'bg-yellow-500' : 'bg-gray-700'}`} />
-          <div className={`text-[9px] font-bold tracking-widest uppercase ${statusColor}`}>{stopping ? "STOPPING" : agent.status}</div>
+          <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#00FF41] animate-pulse shadow-[0_0_8px_#00FF41]' : isWaiting ? 'bg-yellow-500' : 'bg-[#00FF41]/10'}`} />
+          <div className={`text-[12px] font-bold tracking-widest uppercase ${statusColor}`}>{stopping ? "STOPPING" : agent.status}</div>
         </div>
       </div>
 
@@ -331,19 +333,19 @@ export default function NoxDashboard() {
       </div>
 
       {/* LEFT SIDEBAR - TASK QUEUE */}
-      <div className="absolute left-6 top-[140px] bottom-6 w-[320px] flex flex-col z-40">
+      <div className="absolute left-6 top-[140px] bottom-10 w-[320px] flex flex-col z-40">
         <div className="mb-2 px-2 text-[10px] font-bold text-[#00FF41] uppercase tracking-[0.3em] matrix-text-glow">SYSTEM.QUEUE //</div>
-        <div className="flex-1 overflow-hidden border border-[#00FF41]/30 bg-black/60 backdrop-blur-md rounded flex flex-col">
-          <div className="flex-1 overflow-y-auto p-0 custom-scrollbar">
+        <div className="matrix-notched-new flex-1 overflow-hidden bg-black/60 backdrop-blur-md flex flex-col">
+          <div className="flex-1 overflow-y-auto custom-scrollbar z-10 p-5">
             {currentTasks.map((t: any, i: number) => (
               <div key={t.id} className={`p-4 flex flex-col gap-1 border-b border-[#00FF41]/10 hover:bg-[#00FF41]/5 transition-colors cursor-default`}>
                 <div className="flex items-center gap-3">
-                  <span className="text-[10px] text-[#00FF41]/60">{t.id}</span>
-                  <span className={`text-[12px] font-bold tracking-wider ${t.status === 'IN PROGRESS' ? 'text-[#00FF41] matrix-text-glow' : 'text-gray-400'}`}>{t.title}</span>
+                  <span className="text-[11px] text-[#00FF41]/60 font-mono">{t.id}</span>
+                  <span className={`text-[13px] font-bold tracking-wider ${t.status === 'IN PROGRESS' ? 'text-[#00FF41] matrix-text-glow' : 'text-[#00FF41]/40'}`}>{t.title}</span>
                 </div>
                 <div className="flex justify-between items-center ml-6">
-                  <span className="text-[9px] text-gray-500 uppercase tracking-tighter">{t.desc}</span>
-                  {t.status === 'IN PROGRESS' && <span className="text-[8px] animate-pulse text-[#00FF41]">EXECUTING...</span>}
+                  <span className="text-[11px] text-[#00FF41]/30 uppercase tracking-tighter">{t.desc}</span>
+                  {t.status === 'IN PROGRESS' && <span className="text-[9px] animate-pulse text-[#00FF41]">EXECUTING...</span>}
                 </div>
               </div>
             ))}
@@ -352,46 +354,50 @@ export default function NoxDashboard() {
       </div>
 
       {/* RIGHT SIDEBAR - CURRENT TASK & PROGRESS */}
-      <div className="absolute right-6 top-[140px] bottom-6 w-[320px] flex flex-col z-40">
+      <div className="absolute right-6 top-[140px] bottom-10 w-[320px] flex flex-col z-40">
         <div className="mb-2 px-2 text-[10px] font-bold text-[#00FF41] uppercase tracking-[0.3em] matrix-text-glow">CURRENT.PROCESS //</div>
-        <div className="flex-1 overflow-hidden border border-[#00FF41]/30 bg-black/60 backdrop-blur-md rounded p-5 flex flex-col gap-6">
+        <div className="matrix-notched-new flex-1 overflow-hidden bg-black/60 backdrop-blur-md flex flex-col">
+          <div className="p-5 flex flex-col gap-6 z-10 flex-1">
+            {(() => {
+              const queued = fullState?.tasks?.all_queued || [];
+              const activeTask = queued.length > 0 ? queued[0] : null;
+              return (
+                <div className="matrix-notched-new no-corners bg-[#00FF41]/5" style={{ '--notch-size': '4px' } as any}>
+                  <div className="p-4 z-10 relative">
+                    <div className="text-[13px] font-bold text-[#00FF41] mb-2 leading-tight tracking-wide">
+                      {activeTask?.action || (isActiveTask ? fullState.current_task : "NO ACTIVE PROCESS")}
+                    </div>
+                    <div className="text-[11px] leading-relaxed text-[#00FF41]/40 font-light">
+                      {activeTask?.instructions || "System idling. Awaiting next command sequence..."}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
-          {(() => {
-            const queued = fullState?.tasks?.all_queued || [];
-            const activeTask = queued.length > 0 ? queued[0] : null;
-            return (
-              <div className="border border-[#00FF41]/20 p-4 bg-[#00FF41]/5">
-                <div className="text-[11px] font-bold text-[#00FF41] mb-2 leading-tight tracking-wide">
-                  {activeTask?.action || (isActiveTask ? fullState.current_task : "NO ACTIVE PROCESS")}
-                </div>
-                <div className="text-[9px] leading-relaxed text-gray-400 font-light">
-                  {activeTask?.instructions || "System idling. Awaiting next command sequence..."}
-                </div>
+            <div className="flex-1 relative mt-4">
+              <div className="flex flex-col gap-8 relative">
+                {/* Connector Line */}
+                <div className="absolute left-[13px] top-4 bottom-4 border-l border-[#00FF41]/20" />
+
+                {currentAgents.map((s: any, i: number) => (
+                  <div key={s.id} className="flex items-center gap-4 relative">
+                    <div className={`matrix-notched-new no-corners w-8 h-8 flex items-center justify-center text-[11px] font-bold z-10 transition-all 
+                      ${s.status === 'ACTIVE' ? 'bg-[#00FF41] text-black shadow-[0_0_15px_#00FF41]' : 'bg-black text-[#00FF41]/60'}`}
+                      style={{ '--notch-size': '4px' } as any}>
+                      0{i + 1}
+                    </div>
+                    <div className="flex flex-col z-10">
+                      <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' ? 'text-[#00FF41] matrix-text-glow' : 'text-[#00FF41]/40'}`}>
+                        {s.label}
+                      </div>
+                      <div className={`text-[11px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' ? 'text-[#00FF41]/80' : 'text-[#00FF41]/20'}`}>
+                        {s.status}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            );
-          })()}
-
-          <div className="flex-1 relative mt-4">
-            <div className="flex flex-col gap-8 relative">
-              {/* Connector Line */}
-              <div className="absolute left-[13px] top-4 bottom-4 border-l border-[#00FF41]/20" />
-
-              {currentAgents.map((s: any, i: number) => (
-                <div key={s.id} className="flex items-center gap-4 relative">
-                  <div className={`w-7 h-7 rounded border flex items-center justify-center text-[10px] font-bold z-10 transition-all 
-                      ${s.status === 'ACTIVE' ? 'bg-[#00FF41] text-black border-[#00FF41] shadow-[0_0_15px_#00FF41]' : 'bg-black text-[#00FF41]/60 border-[#00FF41]/30'}`}>
-                    0{i + 1}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className={`text-[10px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' ? 'text-[#00FF41] matrix-text-glow' : 'text-gray-500'}`}>
-                      {s.label}
-                    </div>
-                    <div className={`text-[8px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' ? 'text-[#00FF41]/80' : 'text-gray-700'}`}>
-                      {s.status}
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
@@ -446,10 +452,12 @@ export default function NoxDashboard() {
               <div key={a.id} ref={el => { ensureRef(); tileRefs.current[a.id].wrap = el; }} className="tile-wrap">
                 <div ref={el => { ensureRef(); tileRefs.current[a.id].card = el; }} className="tile-card">
                   <div ref={el => { ensureRef(); tileRefs.current[a.id].halo = el; }} className="tile-halo" style={{ background: 'radial-gradient(closest-side, rgba(0, 255, 65, 0.4), transparent)' }} />
-                  <div className="w-9 h-9 border border-[#00FF41]/40 bg-black/80 flex items-center justify-center text-[#00FF41] shadow-[0_0_15px_rgba(0,255,65,0.2)]">
-                    <Icon kind={a.icon} />
+                  <div className="matrix-notched-new no-corners w-11 h-11 flex items-center justify-center shadow-[0_0_15px_rgba(0,255,65,0.1)] relative" style={{ '--notch-size': '6px' } as any}>
+                    <div className="w-8 h-8 rounded-md border border-[#00FF41]/30 flex items-center justify-center text-[#00FF41] bg-black/40">
+                      <Icon kind={a.icon} />
+                    </div>
                   </div>
-                  <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-[#00FF41]/70">{a.label}</span>
+                  <span className="text-[13px] font-bold text-[#00FF41] leading-tight tracking-wide uppercase">{a.label}</span>
                 </div>
               </div>
             );
@@ -458,18 +466,20 @@ export default function NoxDashboard() {
       </div>
 
       {/* FOOTER STATUS */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 h-16 w-fit min-w-[600px] border border-[#00FF41]/30 bg-black/60 backdrop-blur-md rounded px-10 flex items-center justify-between gap-12 z-50">
-        {[
-          { label: 'ACTIVE', val: fullState ? (fullState.pipeline || []).filter((a: any) => a.status === 'in_progress').length : "--" },
-          { label: 'COMPLETED', val: fullState ? (fullState.tasks?.completed || 0) : "--" },
-          { label: 'QUEUED', val: fullState ? (fullState.tasks?.queued || 0) : "--" },
-          { label: 'TOTAL', val: fullState ? (fullState.tasks?.completed || 0) + (fullState.tasks?.queued || 0) : "--" }
-        ].map(stat => (
-          <div key={stat.label} className="flex items-center gap-4">
-            <span className="text-xl font-bold tracking-tighter matrix-text-glow">{stat.val}</span>
-            <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.3em]">{stat.label}</span>
-          </div>
-        ))}
+      <div className="matrix-notched-new absolute bottom-[130px] left-1/2 -translate-x-1/2 h-[90px] w-fit min-w-[700px] bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
+        <div className="w-full h-full px-12 flex items-center justify-between gap-12 z-10">
+          {[
+            { label: 'ACTIVE', val: fullState ? (fullState.pipeline || []).filter((a: any) => a.status === 'in_progress').length : "--" },
+            { label: 'COMPLETED', val: fullState ? (fullState.tasks?.completed || 0) : "--" },
+            { label: 'QUEUED', val: fullState ? (fullState.tasks?.queued || 0) : "--" },
+            { label: 'TOTAL', val: fullState ? (fullState.tasks?.completed || 0) + (fullState.tasks?.queued || 0) : "--" }
+          ].map(stat => (
+            <div key={stat.label} className="flex items-center gap-4">
+              <span className="text-2xl font-bold tracking-tighter matrix-text-glow">{stat.val}</span>
+              <span className="text-[12px] font-bold text-[#00FF41]/40 uppercase tracking-[0.3em]">{stat.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </main>
   );

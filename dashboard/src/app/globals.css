@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -12,10 +13,34 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', ui-monospace, monospace;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
+}
+
+/* Hide Next.js/Vercel Dev Toolbars/Logos */
+[data-nextjs-vitals], 
+[data-vercel-toolbar],
+#vercel-live-feedback,
+.next-dev-tools,
+#next-route-announcer,
+[data-nextjs-toast-wrapper],
+[data-nextjs-dialog-overlay],
+#__next-build-watcher,
+[class*="nextjs-portal"],
+button[aria-label="Next.js Hub"],
+a[href*="vercel.com"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* Hard hide any floating dev icons */
+div[style*="z-index: 9999"],
+div[style*="z-index: 2147483647"] {
+  display: none !important;
 }
 
 /* Matrix Scanline Effect */
@@ -83,4 +108,103 @@ body::before {
 .matrix-card:hover {
   border-color: var(--matrix-green);
   box-shadow: 0 0 15px var(--matrix-green-glow);
+}
+
+/* Notched Cyberpunk Panel Style - FIXED BORDERS */
+.matrix-notched {
+  --notch-size: 8px;
+  --border-width: 1px;
+  position: relative;
+  background: var(--matrix-green);
+  /* This becomes the border color */
+  padding: var(--border-width);
+  clip-path: polygon(var(--notch-size) 0%,
+      calc(100% - var(--notch-size)) 0%,
+      100% var(--notch-size),
+      100% calc(100% - var(--notch-size)),
+      calc(100% - var(--notch-size)) 100%,
+      var(--notch-size) 100%,
+      0% calc(100% - var(--notch-size)),
+      0% var(--notch-size));
+  filter: drop-shadow(0 0 3px var(--matrix-green-glow));
+}
+
+.matrix-notched::before {
+  content: '';
+  position: absolute;
+  inset: var(--border-width);
+  background: rgba(0, 15, 0, 0.9);
+  /* Inner fill (darker) */
+  clip-path: inherit;
+  z-index: 0;
+}
+
+/* Accent corner lines */
+.matrix-notched::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--matrix-green);
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* Notched Cyberpunk Panel Style - FINAL FIX */
+.matrix-notched-new {
+  --notch-size: 6px;
+  --border-width: 1px;
+  position: relative;
+  background: rgba(0, 255, 65, 0.2);
+  padding: var(--border-width);
+  clip-path: polygon(var(--notch-size) 0%,
+      calc(100% - var(--notch-size)) 0%,
+      100% var(--notch-size),
+      100% calc(100% - var(--notch-size)),
+      calc(100% - var(--notch-size)) 100%,
+      var(--notch-size) 100%,
+      0% calc(100% - var(--notch-size)),
+      0% var(--notch-size));
+  filter: drop-shadow(0 0 4px var(--matrix-green-glow));
+}
+
+.matrix-notched-new::before {
+  content: '';
+  position: absolute;
+  inset: var(--border-width);
+  background: rgba(0, 15, 0, 0.95);
+  clip-path: inherit;
+  z-index: 0;
+}
+
+.matrix-notched-new>* {
+  position: relative;
+  z-index: 1;
+}
+
+/* Corner Accents - Offsets avoid the 6px clip-path corners */
+.matrix-notched-new::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    /* Top Left */
+    linear-gradient(to right, #00FF41 15px, transparent 0) 6px 0 / 100% 2px no-repeat,
+    linear-gradient(to bottom, #00FF41 15px, transparent 0) 0 6px / 2px 100% no-repeat,
+    /* Top Right */
+    linear-gradient(to left, #00FF41 15px, transparent 0) calc(100% - 6px) 0 / 100% 2px no-repeat,
+    linear-gradient(to bottom, #00FF41 15px, transparent 0) 100% 6px / 2px 100% no-repeat,
+    /* Bottom Left */
+    linear-gradient(to right, #00FF41 15px, transparent 0) 6px 100% / 100% 2px no-repeat,
+    linear-gradient(to top, #00FF41 15px, transparent 0) 0 calc(100% - 6px) / 2px 100% no-repeat,
+    /* Bottom Right */
+    linear-gradient(to left, #00FF41 15px, transparent 0) calc(100% - 6px) 100% / 100% 2px no-repeat,
+    linear-gradient(to top, #00FF41 15px, transparent 0) 100% calc(100% - 6px) / 2px 100% no-repeat;
+  filter: drop-shadow(0 0 2px #00FF41); /* Reduced blur to keep lines sharp */
+  opacity: 1;
+  z-index: 2;
+  pointer-events: none;
+}
+/* Utility to hide corner accents where not needed */
+.no-corners::after {
+  display: none !important;
 }
