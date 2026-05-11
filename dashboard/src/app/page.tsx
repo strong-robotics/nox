@@ -121,6 +121,7 @@ export default function NoxDashboard() {
   const ringGradRef = useRef<SVGSVGElement>(null);
   const orbitDashedRef = useRef<HTMLDivElement>(null);
   const orbitDotsRef = useRef<HTMLDivElement>(null);
+  const coreContainerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
   const tileRefs = useRef<Record<string, { wrap: HTMLDivElement | null; card: HTMLDivElement | null; halo: HTMLDivElement | null }>>({});
@@ -259,6 +260,10 @@ export default function NoxDashboard() {
       const baseR = (dashDVal - 1.5) / 2;
       const orbitRot = (t * 360) / orbitPeriod;
 
+      if (coreContainerRef.current) {
+        coreContainerRef.current.style.transform = `translate(-50%, -50%) rotate(${-orbitRot.toFixed(2)}deg)`;
+      }
+
       agentsRef.current.forEach((a: any) => {
         const refs = tileRefs.current[a.id];
         if (!refs || !refs.wrap) return;
@@ -311,6 +316,18 @@ export default function NoxDashboard() {
   return (
     <main className="relative w-full h-screen bg-black text-[#00FFBD] font-mono overflow-hidden">
       <MatrixRain />
+
+      {/* GLOBAL BACKGROUND ELEMENTS */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(0,255,189,0.3)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,189,0.3)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-40" />
+      </div>
+
+      {/* SCANLINE EFFECT */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-50">
+        <div className="w-full h-[2px] bg-[#00FFBD]/10 animate-scanline" />
+      </div>
+
       <style dangerouslySetInnerHTML={{
         __html: `
         .orbit-dashed { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1px dashed rgba(0, 255, 65, 0.2); will-change: transform; }
@@ -411,17 +428,22 @@ export default function NoxDashboard() {
       <div className="w-full h-full relative flex items-center justify-center">
         <div ref={stageRef} className="relative w-[min(900px,90vmin)] h-[min(900px,90vmin)]">
 
-          <NeuralCore
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            size={ringD * 0.7}
-            mode={
-              state === "speaking" || currentAgents.some((a: any) => a.status === "WAITING")
-                ? "talking"
-                : state === "processing"
-                  ? "thinking"
-                  : "idle"
-            }
-          />
+          <div 
+            ref={coreContainerRef} 
+            className="absolute left-1/2 top-1/2"
+            style={{ width: ringD * 0.7, height: ringD * 0.7 }}
+          >
+            <NeuralCore
+              size={ringD * 0.7}
+              mode={
+                state === "speaking" || currentAgents.some((a: any) => a.status === "ACTIVE")
+                  ? "talking"
+                  : state === "processing"
+                    ? "thinking"
+                    : "idle"
+              }
+            />
+          </div>
 
           <div ref={orbitDashedRef} className="orbit-dashed" style={{ width: dashD, height: dashD }} />
           <div ref={orbitDotsRef} className="absolute left-1/2 top-1/2 w-0 h-0">
