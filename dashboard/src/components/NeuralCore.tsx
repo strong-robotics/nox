@@ -44,7 +44,7 @@ interface NeuralCoreProps {
 }
 
 const COLORS = ["#00FF41", "#008F11", "#003B00", "#0D0208"];
-const GRID_SIZE = 24;
+const GRID_SIZE = 14;
 
 export default function NeuralCore({ size = 400, mode = "idle", className = "" }: NeuralCoreProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -340,19 +340,19 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
 
           const segmentAlpha = (0.2 + 0.8 * (i / snake.points.length)) * lifeAlpha;
 
-          ctx.lineWidth = 4.0;
+          ctx.lineWidth = 5.0; // Было 4.0
           ctx.strokeStyle = snake.color;
-          ctx.globalAlpha = segmentAlpha * 0.2;
+          ctx.globalAlpha = segmentAlpha * 0.3; // Было 0.2
           strokeWarpedSegment(p1.x, p1.y, x2, y2, 10);
 
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 2.5; // Было 1.5
           ctx.strokeStyle = snake.color;
-          ctx.globalAlpha = segmentAlpha * 0.6;
+          ctx.globalAlpha = segmentAlpha * 0.8; // Было 0.6
           strokeWarpedSegment(p1.x, p1.y, x2, y2, 10);
 
-          ctx.lineWidth = 0.8;
+          ctx.lineWidth = 1.8; // Было 0.8
           ctx.strokeStyle = "#ffffff";
-          ctx.globalAlpha = segmentAlpha * 0.9;
+          ctx.globalAlpha = segmentAlpha * 1.0; // Было 0.9
           strokeWarpedSegment(p1.x, p1.y, x2, y2, 10);
         }
         ctx.restore();
@@ -364,13 +364,13 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         const [hx, hy] = warp(rawHx, rawHy);
 
         ctx.save();
-        const headGlow = ctx.createRadialGradient(hx, hy, 0, hx, hy, 5);
+        const headGlow = ctx.createRadialGradient(hx, hy, 0, hx, hy, 7);
         headGlow.addColorStop(0, snake.color); headGlow.addColorStop(1, "transparent");
-        ctx.fillStyle = headGlow; ctx.globalAlpha = 0.3;
-        ctx.beginPath(); ctx.arc(hx, hy, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = headGlow; ctx.globalAlpha = 0.5;
+        ctx.beginPath(); ctx.arc(hx, hy, 7, 0, Math.PI * 2); ctx.fill();
 
         ctx.fillStyle = "#fff"; ctx.globalAlpha = 1;
-        ctx.beginPath(); ctx.arc(hx, hy, 1.2, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(hx, hy, 1.8, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       });
 

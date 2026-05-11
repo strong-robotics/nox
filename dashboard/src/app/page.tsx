@@ -12,10 +12,10 @@ const fmtTime = (iso: string) => {
 
 // --- CONFIGURATION ---
 const AGENTS = [
-  { id: "architect", label: "ARCHITECT", model: "Gemini Flash 3", status: "ACTIVE", time: "02:14:32", angle: 0, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "architect" },
-  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: -90, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "designer" },
-  { id: "developer", label: "DEVELOPER", model: "Claude", status: "INACTIVE", time: "", angle: 90, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "developer" },
-  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: 180, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "tester" },
+  { id: "architect", label: "ARCHITECT", model: "Gemini Flash 3", status: "ACTIVE", time: "02:14:32", angle: 0, color: "#00FFBD", gradFrom: "#00FFBD", gradTo: "#008F11", icon: "architect" },
+  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: -90, color: "#00FFBD", gradFrom: "#00FFBD", gradTo: "#008F11", icon: "designer" },
+  { id: "developer", label: "DEVELOPER", model: "Claude", status: "INACTIVE", time: "", angle: 90, color: "#00FFBD", gradFrom: "#00FFBD", gradTo: "#008F11", icon: "developer" },
+  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: 180, color: "#00FFBD", gradFrom: "#00FFBD", gradTo: "#008F11", icon: "tester" },
 ];
 
 const RING_DIAMETER = 0.403;
@@ -64,30 +64,30 @@ function AgentStatusCard({ agent }: { agent: any }) {
   const isWaiting = agent.status === "WAITING";
   const isLive = isActive || isWaiting;
 
-  const statusColor = isActive ? "text-[#00FF41]" : isWaiting ? "text-yellow-400" : "text-[#00FF41]/30";
+  const statusColor = isActive ? "text-[#00FFBD]" : isWaiting ? "text-yellow-400" : "text-[#00FFBD]/30";
   const glowClass = isActive ? "matrix-glow" : "";
 
   return (
     <div className={`matrix-notched-new relative flex-1 h-[105px] min-h-[105px] p-5 flex items-center gap-4 overflow-hidden group ${isActive ? 'shadow-[0_0_20px_rgba(0,255,65,0.15)]' : ''}`}>
       {/* Scanline overlay for the card */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00FF41]/5 to-transparent bg-[length:100%_4px] pointer-events-none opacity-20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00FFBD]/5 to-transparent bg-[length:100%_4px] pointer-events-none opacity-20" />
 
       {/* Inner Icon Box - Rounded per example */}
-      <div className={`w-10 h-10 rounded-md border border-[#00FF41]/40 flex items-center justify-center text-[#00FF41] flex-shrink-0 bg-black/40 ${isActive ? 'shadow-[0_0_12px_rgba(0,255,65,0.25)]' : ''}`}>
+      <div className={`w-10 h-10 rounded-md border border-[#00FFBD]/40 flex items-center justify-center text-[#00FFBD] flex-shrink-0 bg-black/40 ${isActive ? 'shadow-[0_0_12px_rgba(0,255,65,0.25)]' : ''}`}>
         <Icon kind={agent.icon} />
       </div>
 
       <div className="flex flex-col gap-0.5 flex-1 min-w-0 z-10">
         <div className="flex justify-between items-start">
-          <div className={`text-[13px] font-bold text-[#00FF41] leading-tight tracking-wide uppercase ${glowClass}`}>{agent.label}</div>
+          <div className={`text-[13px] font-bold text-[#00FFBD] leading-tight tracking-wide uppercase ${glowClass}`}>{agent.label}</div>
           {isLive && (agent.agentId || agent.pid) && (
-            <div className="text-[11px] font-mono text-[#00FF41]/40">#{agent.agentId ?? agent.pid}</div>
+            <div className="text-[11px] font-mono text-[#00FFBD]/40">#{agent.agentId ?? agent.pid}</div>
           )}
         </div>
-        <div className="text-[13px] text-[#00FF41]/40 truncate">{agent.model || "—"}</div>
-        <div className="text-[12px] text-[#00FF41]/50 tracking-wider">[{agent.env || ""}]</div>
+        <div className="text-[13px] text-[#00FFBD]/40 truncate">{agent.model || "—"}</div>
+        <div className="text-[12px] text-[#00FFBD]/50 tracking-wider">[{agent.env || ""}]</div>
         <div className="flex items-center gap-2 mt-1">
-          <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#00FF41] animate-pulse shadow-[0_0_8px_#00FF41]' : isWaiting ? 'bg-yellow-500' : 'bg-[#00FF41]/10'}`} />
+          <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#00FFBD] animate-pulse shadow-[0_0_8px_#00FFBD]' : isWaiting ? 'bg-yellow-500' : 'bg-[#00FFBD]/10'}`} />
           <div className={`text-[12px] font-bold tracking-widest uppercase ${statusColor}`}>{stopping ? "STOPPING" : agent.status}</div>
         </div>
       </div>
@@ -142,10 +142,10 @@ export default function NoxDashboard() {
   }, []);
 
   const AGENT_META: Record<string, any> = {
-    architect: { label: "ARCHITECT", angle: 0, color: "#00FF41", icon: "architect" },
-    designer: { label: "DESIGNER", angle: -90, color: "#00FF41", icon: "designer" },
-    developer: { label: "DEVELOPER", angle: 90, color: "#00FF41", icon: "developer" },
-    tester: { label: "TESTER", angle: 180, color: "#00FF41", icon: "tester" },
+    architect: { label: "ARCHITECT", angle: 0, color: "#00FFBD", icon: "architect" },
+    designer: { label: "DESIGNER", angle: -90, color: "#00FFBD", icon: "designer" },
+    developer: { label: "DEVELOPER", angle: 90, color: "#00FFBD", icon: "developer" },
+    tester: { label: "TESTER", angle: 180, color: "#00FFBD", icon: "tester" },
   };
 
   const resolveAgentStatus = (pipelineStatus: string, role: string): string => {
@@ -190,7 +190,7 @@ export default function NoxDashboard() {
 
     const liveAgentsAll: any[] = fullState?.live_agents || [];
     return fullState.pipeline.map((p: any) => {
-      const meta = AGENT_META[p.role.toLowerCase()] || { label: p.role.toUpperCase(), angle: 0, color: "#00FF41", icon: "developer" };
+      const meta = AGENT_META[p.role.toLowerCase()] || { label: p.role.toUpperCase(), angle: 0, color: "#00FFBD", icon: "developer" };
       const liveAgent = liveAgentsAll.find(
         (a: any) => a.role.toLowerCase() === p.role.toLowerCase() && a.alive
       );
@@ -227,7 +227,7 @@ export default function NoxDashboard() {
       title: t.action || t,
       desc: t.stack ? `${t.stack} Stack` : "Queued",
       status: isActiveTask && i === 0 ? "IN PROGRESS" : "QUEUED",
-      color: "#00FF41"
+      color: "#00FFBD"
     }));
   }, [fullState, isActiveTask]);
 
@@ -309,7 +309,7 @@ export default function NoxDashboard() {
   if (!mounted) return <main className="min-h-screen bg-black" />;
 
   return (
-    <main className="relative w-full h-screen bg-black text-[#00FF41] font-mono overflow-hidden">
+    <main className="relative w-full h-screen bg-black text-[#00FFBD] font-mono overflow-hidden">
       <MatrixRain />
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -321,8 +321,8 @@ export default function NoxDashboard() {
         .arrow-line { position: absolute; top: -0.5px; height: 1px; will-change: opacity; }
         .arrow-head { position: absolute; top: -3px; width: 0; height: 0; border-top: 3px solid transparent; border-bottom: 3px solid transparent; border-left: 5px solid; will-change: opacity; }
         .custom-scrollbar::-webkit-scrollbar { width: 2px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00FF41; }
-        .matrix-text-glow { text-shadow: 0 0 8px #00FF41; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00FFBD; }
+        .matrix-text-glow { text-shadow: 0 0 8px #00FFBD; }
       `}} />
 
       {/* HEADER BLOCK */}
@@ -336,18 +336,18 @@ export default function NoxDashboard() {
 
       {/* LEFT SIDEBAR - TASK QUEUE */}
       <div className="absolute left-6 top-[140px] bottom-10 w-[320px] flex flex-col z-40">
-        <div className="mb-2 px-2 text-[10px] font-bold text-[#00FF41] uppercase tracking-[0.3em] matrix-text-glow">SYSTEM.QUEUE //</div>
+        <div className="mb-2 px-2 text-[10px] font-bold text-[#00FFBD] uppercase tracking-[0.3em] matrix-text-glow">SYSTEM.QUEUE //</div>
         <div className="matrix-notched-new flex-1 overflow-hidden bg-black/60 backdrop-blur-md flex flex-col">
           <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] z-10 p-5">
             {currentTasks.map((t: any, i: number) => (
-              <div key={t.id} className={`p-4 flex flex-col gap-1 border-b border-[#00FF41]/10`}>
+              <div key={t.id} className={`p-4 flex flex-col gap-1 border-b border-[#00FFBD]/10`}>
                 <div className="flex items-center gap-3">
-                  <span className="text-[11px] text-[#00FF41]/60 font-mono">{t.id}</span>
-                  <span className={`text-[13px] font-bold tracking-wider text-[#00FF41] ${t.status === 'IN PROGRESS' ? 'matrix-text-glow' : ''}`}>{t.title}</span>
+                  <span className="text-[11px] text-[#00FFBD]/60 font-mono">{t.id}</span>
+                  <span className={`text-[13px] font-bold tracking-wider text-[#00FFBD] ${t.status === 'IN PROGRESS' ? 'matrix-text-glow' : ''}`}>{t.title}</span>
                 </div>
                 <div className="flex justify-between items-center ml-6">
-                  <span className="text-[11px] text-[#00FF41]/30 uppercase tracking-tighter">{t.desc}</span>
-                  {t.status === 'IN PROGRESS' && <span className="text-[9px] animate-pulse text-[#00FF41]">EXECUTING...</span>}
+                  <span className="text-[11px] text-[#00FFBD]/30 uppercase tracking-tighter">{t.desc}</span>
+                  {t.status === 'IN PROGRESS' && <span className="text-[9px] animate-pulse text-[#00FFBD]">EXECUTING...</span>}
                 </div>
               </div>
             ))}
@@ -357,19 +357,19 @@ export default function NoxDashboard() {
 
       {/* RIGHT SIDEBAR - CURRENT TASK & PROGRESS */}
       <div className="absolute right-6 top-[140px] bottom-10 w-[320px] flex flex-col z-40">
-        <div className="mb-2 px-2 text-[10px] font-bold text-[#00FF41] uppercase tracking-[0.3em] matrix-text-glow">CURRENT.PROCESS //</div>
+        <div className="mb-2 px-2 text-[10px] font-bold text-[#00FFBD] uppercase tracking-[0.3em] matrix-text-glow">CURRENT.PROCESS //</div>
         <div className="matrix-notched-new flex-1 overflow-hidden bg-black/60 backdrop-blur-md flex flex-col">
           <div className="p-5 flex flex-col gap-6 z-10 flex-1">
             {(() => {
               const queued = fullState?.tasks?.all_queued || [];
               const activeTask = queued.length > 0 ? queued[0] : null;
               return (
-                <div className="matrix-notched-new no-corners bg-[#00FF41]/5" style={{ '--notch-size': '4px' } as any}>
+                <div className="matrix-notched-new no-corners bg-[#00FFBD]/5" style={{ '--notch-size': '4px' } as any}>
                   <div className="p-4 z-10 relative">
-                    <div className="text-[13px] font-bold text-[#00FF41] mb-2 leading-tight tracking-wide">
+                    <div className="text-[13px] font-bold text-[#00FFBD] mb-2 leading-tight tracking-wide">
                       {activeTask?.action || (isActiveTask ? fullState.current_task : "NO ACTIVE PROCESS")}
                     </div>
-                    <div className="text-[11px] leading-relaxed text-[#00FF41]/40 font-light">
+                    <div className="text-[11px] leading-relaxed text-[#00FFBD]/40 font-light">
                       {activeTask?.instructions || "System idling. Awaiting next command sequence..."}
                     </div>
                   </div>
@@ -380,20 +380,20 @@ export default function NoxDashboard() {
             <div className="flex-1 relative mt-4">
               <div className="flex flex-col gap-8 relative">
                 {/* Connector Line */}
-                <div className="absolute left-[13px] top-4 bottom-4 border-l border-[#00FF41]/20" />
+                <div className="absolute left-[13px] top-4 bottom-4 border-l border-[#00FFBD]/20" />
 
                 {currentAgents.map((s: any, i: number) => (
                   <div key={s.id} className="flex items-center gap-4 relative">
                     <div className={`matrix-notched-new no-corners w-8 h-8 flex items-center justify-center text-[11px] font-bold z-10 transition-all 
-                      ${s.status === 'ACTIVE' ? 'bg-[#00FF41] text-black shadow-[0_0_15px_#00FF41]' : 'bg-black text-[#00FF41]/60'}`}
+                      ${s.status === 'ACTIVE' ? 'bg-[#00FFBD] text-black shadow-[0_0_15px_#00FFBD]' : 'bg-black text-[#00FFBD]/60'}`}
                       style={{ '--notch-size': '4px' } as any}>
                       0{i + 1}
                     </div>
                     <div className="flex flex-col z-10">
-                      <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' ? 'text-[#00FF41] matrix-text-glow' : 'text-[#00FF41]/40'}`}>
+                      <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' ? 'text-[#00FFBD] matrix-text-glow' : 'text-[#00FFBD]/40'}`}>
                         {s.label}
                       </div>
-                      <div className={`text-[11px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' ? 'text-[#00FF41]/80' : 'text-[#00FF41]/20'}`}>
+                      <div className={`text-[11px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' ? 'text-[#00FFBD]/80' : 'text-[#00FFBD]/20'}`}>
                         {s.status}
                       </div>
                     </div>
@@ -478,7 +478,7 @@ export default function NoxDashboard() {
           ].map(stat => (
             <div key={stat.label} className="flex items-center gap-4">
               <span className="text-2xl font-bold tracking-tighter matrix-text-glow">{stat.val}</span>
-              <span className="text-[12px] font-bold text-[#00FF41]/40 uppercase tracking-[0.3em]">{stat.label}</span>
+              <span className="text-[12px] font-bold text-[#00FFBD]/40 uppercase tracking-[0.3em]">{stat.label}</span>
             </div>
           ))}
         </div>

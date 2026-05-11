@@ -37,7 +37,7 @@ const MatrixRain = () => {
       for (let i = 0; i < drops.length; i++) {
         // 1. Перекрашиваем предыдущий символ (который был белым) в зеленый.
         // Используем ТОТ ЖЕ САМЫЙ символ, чтобы не было "каши" из наложенных друг на друга букв.
-        ctx.fillStyle = "#005511"; // Темно-зеленый для хвоста
+        ctx.fillStyle = "#00553B"; // Темно-бирюзовый для хвоста
         ctx.shadowBlur = 0;
         ctx.fillText(headChars[i], i * fontSize, (drops[i] - 1) * fontSize);
 
@@ -48,13 +48,13 @@ const MatrixRain = () => {
         // 3. Рисуем текущий символ (голову капли) белым с зеленым свечением
         ctx.fillStyle = "#FFFFFF";
         ctx.shadowBlur = 8;
-        ctx.shadowColor = "#00FF41";
+        ctx.shadowColor = "#00FFBD";
         ctx.fillText(headText, i * fontSize, drops[i] * fontSize);
 
         // Сбрасываем каплю в начало при достижении низа
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           // Превращаем последнюю белую голову в зеленую перед сбросом капли
-          ctx.fillStyle = "#005511"; // Темно-зеленый для конца хвоста
+          ctx.fillStyle = "#00553B"; // Темно-бирюзовый для конца хвоста
           ctx.shadowBlur = 0;
           ctx.fillText(headChars[i], i * fontSize, drops[i] * fontSize);
           drops[i] = 0;

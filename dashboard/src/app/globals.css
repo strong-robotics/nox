@@ -3,11 +3,11 @@
 
 :root {
   --background: #000000;
-  --foreground: #00FF41;
-  --matrix-green: #00FF41;
-  --matrix-green-glow: rgba(0, 255, 65, 0.4);
-  --matrix-green-dark: #003B00;
-  --matrix-green-dim: rgba(0, 255, 65, 0.15);
+  --foreground: #00FFBD;
+  --matrix-green: #00FFBD;
+  --matrix-green-glow: rgba(0, 255, 189, 0.4);
+  --matrix-green-dark: #003B2B;
+  --matrix-green-dim: rgba(0, 255, 189, 0.15);
 }
 
 body {
@@ -133,7 +133,7 @@ body::before {
   content: '';
   position: absolute;
   inset: var(--border-width);
-  background: rgba(0, 15, 0, 0.9);
+  background: rgba(0, 15, 11, 0.9);
   /* Inner fill (darker) */
   clip-path: inherit;
   z-index: 0;
@@ -154,7 +154,7 @@ body::before {
   --notch-size: 6px;
   --border-width: 1px;
   position: relative;
-  background: rgba(0, 255, 65, 0.2);
+  background: rgba(0, 255, 189, 0.2);
   padding: var(--border-width);
   clip-path: polygon(var(--notch-size) 0%,
       calc(100% - var(--notch-size)) 0%,
@@ -171,7 +171,7 @@ body::before {
   content: '';
   position: absolute;
   inset: var(--border-width);
-  background: rgba(0, 15, 0, 0.95);
+  background: rgba(0, 15, 11, 0.95);
   clip-path: inherit;
   z-index: 0;
 }
@@ -188,18 +188,18 @@ body::before {
   inset: 0;
   background:
     /* Top Left */
-    linear-gradient(to right, #00FF41 15px, transparent 0) 6px 0 / 100% 2px no-repeat,
-    linear-gradient(to bottom, #00FF41 15px, transparent 0) 0 6px / 2px 100% no-repeat,
+    linear-gradient(to right, #00FFBD 15px, transparent 0) 6px 0 / 100% 2px no-repeat,
+    linear-gradient(to bottom, #00FFBD 15px, transparent 0) 0 6px / 2px 100% no-repeat,
     /* Top Right */
-    linear-gradient(to left, #00FF41 15px, transparent 0) calc(100% - 6px) 0 / 100% 2px no-repeat,
-    linear-gradient(to bottom, #00FF41 15px, transparent 0) 100% 6px / 2px 100% no-repeat,
+    linear-gradient(to left, #00FFBD 15px, transparent 0) calc(100% - 6px) 0 / 100% 2px no-repeat,
+    linear-gradient(to bottom, #00FFBD 15px, transparent 0) 100% 6px / 2px 100% no-repeat,
     /* Bottom Left */
-    linear-gradient(to right, #00FF41 15px, transparent 0) 6px 100% / 100% 2px no-repeat,
-    linear-gradient(to top, #00FF41 15px, transparent 0) 0 calc(100% - 6px) / 2px 100% no-repeat,
+    linear-gradient(to right, #00FFBD 15px, transparent 0) 6px 100% / 100% 2px no-repeat,
+    linear-gradient(to top, #00FFBD 15px, transparent 0) 0 calc(100% - 6px) / 2px 100% no-repeat,
     /* Bottom Right */
-    linear-gradient(to left, #00FF41 15px, transparent 0) calc(100% - 6px) 100% / 100% 2px no-repeat,
-    linear-gradient(to top, #00FF41 15px, transparent 0) 100% calc(100% - 6px) / 2px 100% no-repeat;
-  filter: drop-shadow(0 0 2px #00FF41); /* Reduced blur to keep lines sharp */
+    linear-gradient(to left, #00FFBD 15px, transparent 0) calc(100% - 6px) 100% / 100% 2px no-repeat,
+    linear-gradient(to top, #00FFBD 15px, transparent 0) 100% calc(100% - 6px) / 2px 100% no-repeat;
+  filter: drop-shadow(0 0 2px #00FFBD); /* Reduced blur to keep lines sharp */
   opacity: 1;
   z-index: 2;
   pointer-events: none;
