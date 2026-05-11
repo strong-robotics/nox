@@ -385,8 +385,8 @@ export default function NoxDashboard() {
                 {currentAgents.map((s: any, i: number) => (
                   <div key={s.id} className="flex items-center gap-4 relative">
                     <div className={`matrix-notched-new no-corners w-8 h-8 flex items-center justify-center text-[12px] font-bold z-10 transition-all border
-                      ${s.status === 'ACTIVE' 
-                        ? 'bg-black/80 text-[#00FF41] border-[#00FF41] shadow-[0_0_15px_rgba(0,255,65,0.2)]' 
+                      ${s.status === 'ACTIVE'
+                        ? 'bg-black/80 text-[#00FF41] border-[#00FF41] shadow-[0_0_15px_rgba(0,255,65,0.2)]'
                         : 'bg-black/80 text-[#00FFBD]/40 border-[#00FFBD]/20'}`}
                       style={{ '--notch-size': '4px' } as any}>
                       <span className="relative z-10">0{i + 1}</span>
@@ -415,10 +415,10 @@ export default function NoxDashboard() {
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             size={ringD * 0.7}
             mode={
-              state === "speaking" || currentAgents.some((a: any) => a.status === "WAITING") 
-                ? "talking" 
-                : state === "processing" 
-                  ? "thinking" 
+              state === "speaking" || currentAgents.some((a: any) => a.status === "WAITING")
+                ? "talking"
+                : state === "processing"
+                  ? "thinking"
                   : "idle"
             }
           />
