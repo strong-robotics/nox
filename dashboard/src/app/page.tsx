@@ -79,7 +79,7 @@ function AgentStatusCard({ agent }: { agent: any }) {
 
       <div className="flex flex-col gap-0.5 flex-1 min-w-0 z-10">
         <div className="flex justify-between items-start">
-          <div className={`text-[13px] font-bold text-[#00FFBD] leading-tight tracking-wide uppercase ${glowClass}`}>{agent.label}</div>
+          <div className={`text-[13px] font-bold ${isLive ? 'text-white' : 'text-[#00FFBD]'} leading-tight tracking-wide uppercase`}>{agent.label}</div>
           {isLive && (agent.agentId || agent.pid) && (
             <div className="text-[11px] font-mono text-[#00FFBD]/40">#{agent.agentId ?? agent.pid}</div>
           )}
@@ -358,7 +358,7 @@ export default function NoxDashboard() {
       {/* RIGHT SIDEBAR - CURRENT TASK & PROGRESS */}
       <div className="absolute right-6 top-[140px] bottom-10 w-[320px] flex flex-col z-40">
         <div className="mb-2 px-2 text-[10px] font-bold text-[#00FFBD] uppercase tracking-[0.3em] matrix-text-glow">CURRENT.PROCESS //</div>
-        <div className="matrix-notched-new flex-1 overflow-hidden bg-black/60 backdrop-blur-md flex flex-col">
+        <div className="matrix-notched-new flex-1 overflow-hidden bg-black/80 flex flex-col">
           <div className="p-5 flex flex-col gap-6 z-10 flex-1">
             {(() => {
               const queued = fullState?.tasks?.all_queued || [];
@@ -366,10 +366,10 @@ export default function NoxDashboard() {
               return (
                 <div className="matrix-notched-new no-corners bg-[#00FFBD]/5" style={{ '--notch-size': '4px' } as any}>
                   <div className="p-4 z-10 relative">
-                    <div className="text-[13px] font-bold text-[#00FFBD] mb-2 leading-tight tracking-wide">
+                    <div className="text-[13px] font-bold text-white mb-2 leading-tight tracking-wide">
                       {activeTask?.action || (isActiveTask ? fullState.current_task : "NO ACTIVE PROCESS")}
                     </div>
-                    <div className="text-[11px] leading-relaxed text-[#00FFBD]/40 font-light">
+                    <div className="text-[11px] leading-relaxed text-[#00FFBD] font-light">
                       {activeTask?.instructions || "System idling. Awaiting next command sequence..."}
                     </div>
                   </div>
@@ -384,16 +384,18 @@ export default function NoxDashboard() {
 
                 {currentAgents.map((s: any, i: number) => (
                   <div key={s.id} className="flex items-center gap-4 relative">
-                    <div className={`matrix-notched-new no-corners w-8 h-8 flex items-center justify-center text-[11px] font-bold z-10 transition-all 
-                      ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'bg-[#00FF41] text-black shadow-[0_0_15px_#00FF41]' : 'bg-black text-[#00FFBD]/60'}`}
+                    <div className={`matrix-notched-new no-corners w-8 h-8 flex items-center justify-center text-[12px] font-bold z-10 transition-all border
+                      ${s.status === 'ACTIVE' || s.status === 'WAITING' 
+                        ? 'bg-black/80 text-[#00FF41] border-[#00FF41] shadow-[0_0_15px_rgba(0,255,65,0.2)]' 
+                        : 'bg-black/80 text-white border-[#00FFBD]/40'}`}
                       style={{ '--notch-size': '4px' } as any}>
-                      0{i + 1}
+                      <span className="relative z-10">0{i + 1}</span>
                     </div>
                     <div className="flex flex-col z-10">
-                      <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'text-[#00FFBD] matrix-text-glow' : 'text-[#00FFBD]/40'}`}>
+                      <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'text-white' : 'text-[#00FFBD]/40'}`}>
                         {s.label}
                       </div>
-                      <div className={`text-[11px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'text-[#00FF41]/80' : 'text-[#00FFBD]/20'}`}>
+                      <div className={`text-[11px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'text-[#00FF41] matrix-text-glow' : 'text-[#00FFBD]/20'}`}>
                         {s.status}
                       </div>
                     </div>

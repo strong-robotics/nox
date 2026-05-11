@@ -52,7 +52,7 @@ body::before {
   left: 0;
   bottom: 0;
   right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background: linear-gradient(rgba(18, 16, 16, 0) 75%, rgba(0, 0, 0, 0.18) 75%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
   z-index: 9999;
   background-size: 100% 4px, 3px 100%;
   pointer-events: none;
@@ -171,9 +171,13 @@ body::before {
   content: '';
   position: absolute;
   inset: var(--border-width);
-  background: rgba(0, 15, 11, 0.95);
+  background: var(--notched-bg, rgba(0, 15, 11, 0.95));
   clip-path: inherit;
   z-index: 0;
+}
+
+.matrix-active-box::before {
+  background: #00FF41 !important;
 }
 
 .matrix-notched-new>* {

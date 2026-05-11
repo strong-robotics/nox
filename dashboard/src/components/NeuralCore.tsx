@@ -427,7 +427,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
           zIndex: 10
         }}
       />
-      <canvas ref={canvasRef} style={{ width: "100%", height: "100%", filter: "contrast(1.1) saturate(1.2)" }} />
+      <canvas ref={canvasRef} style={{ width: "100%", height: "100%" }} />
     </div>
   );
 }
