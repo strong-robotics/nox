@@ -67,11 +67,44 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
     canvas.height = size * dpr;
     ctx.scale(dpr, dpr);
 
+    const BULGE = 1.0;
+    const warp = (x: number, y: number): [number, number] => {
+      const dx = x - size / 2, dy = y - size / 2;
+      const r = Math.sqrt(dx * dx + dy * dy);
+      const R = size / 2;
+      if (r < 0.01 || R < 0.01) return [x, y];
+      let t = r / R;
+      if (t > 1) t = 1;
+      const k = Math.sin((t * Math.PI) / 2);
+      const f = ((1 - BULGE) * t + BULGE * k) / t;
+      return [size / 2 + dx * f, size / 2 + dy * f];
+    };
+
+    const strokeWarped = (pts: [number, number][]) => {
+      ctx.beginPath();
+      for (let i = 0; i < pts.length; i++) {
+        const [wx, wy] = warp(pts[i][0], pts[i][1]);
+        if (i === 0) ctx.moveTo(wx, wy);
+        else ctx.lineTo(wx, wy);
+      }
+      ctx.stroke();
+    };
+
+    const strokeWarpedSegment = (ax: number, ay: number, bx: number, by: number, steps: number) => {
+      const pts: [number, number][] = [];
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        pts.push([ax + (bx - ax) * t, ay + (by - ay) * t]);
+      }
+      strokeWarped(pts);
+    };
+
+
     const initSnake = (): Snake => {
       const angle = Math.random() * Math.PI * 2;
       const r = Math.random() * (size / 2 - GRID_SIZE * 2);
-      const startX = Math.round((size / 2 + Math.cos(angle) * r) / GRID_SIZE) * GRID_SIZE;
-      const startY = Math.round((size / 2 + Math.sin(angle) * r) / GRID_SIZE) * GRID_SIZE;
+      const startX = size / 2 + Math.round((Math.cos(angle) * r) / GRID_SIZE) * GRID_SIZE;
+      const startY = size / 2 + Math.round((Math.sin(angle) * r) / GRID_SIZE) * GRID_SIZE;
 
       const dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
       const initialDir = dirs[Math.floor(Math.random() * dirs.length)];
@@ -174,57 +207,20 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
       // 2. Primary Main Grid
       ctx.save();
       ctx.beginPath();
-      ctx.arc(size/2, size/2, (size / 2) * 0.8, 0, Math.PI * 2);
+      ctx.arc(size/2, size/2, (size / 2) * 0.98, 0, Math.PI * 2);
       ctx.clip();
-
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(0, 255, 65, 0.1)";
-      ctx.lineWidth = 0.5;
-      for (let x = GRID_SIZE; x < size; x += GRID_SIZE) {
-        ctx.moveTo(x, 0); ctx.lineTo(x, size);
+      ctx.strokeStyle = "rgba(0, 255, 65, 0.15)";
+      ctx.lineWidth = 1.0;
+      const SUB = 32;
+      const startX = (size/2) - Math.floor((size/2 + GRID_SIZE * 2) / GRID_SIZE) * GRID_SIZE;
+      const startY = (size/2) - Math.floor((size/2 + GRID_SIZE * 2) / GRID_SIZE) * GRID_SIZE;
+      const endX = size + GRID_SIZE * 2;
+      const endY = size + GRID_SIZE * 2;
+      for (let x = startX; x <= endX; x += GRID_SIZE) {
+        strokeWarpedSegment(x, -GRID_SIZE, x, size + GRID_SIZE, SUB);
       }
-      for (let y = GRID_SIZE; y < size; y += GRID_SIZE) {
-        ctx.moveTo(0, y); ctx.lineTo(size, y);
-      }
-      ctx.stroke();
-      ctx.restore();
-
-      // 4. Secondary Tunnel Rim (0.65)
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(0, 255, 65, 0.08)";
-      ctx.lineWidth = 0.4;
-      ctx.arc(size/2, size/2, (size / 2) * 0.65, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // 5. Secondary Micro Grid & Dots
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(size/2, size/2, (size / 2) * 0.65, 0, Math.PI * 2);
-      ctx.clip();
-
-      const SMALL_GRID = GRID_SIZE / 2;
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(0, 255, 65, 0.05)";
-      ctx.lineWidth = 0.3;
-      for (let x = SMALL_GRID; x < size; x += SMALL_GRID) {
-        ctx.moveTo(x, 0); ctx.lineTo(x, size);
-      }
-      for (let y = SMALL_GRID; y < size; y += SMALL_GRID) {
-        ctx.moveTo(0, y); ctx.lineTo(size, y);
-      }
-      ctx.stroke();
-
-      // Dots
-      ctx.fillStyle = "rgba(0, 255, 65, 0.15)";
-      for (let x = GRID_SIZE; x < size; x += GRID_SIZE) {
-        for (let y = GRID_SIZE; y < size; y += GRID_SIZE) {
-          const dx = x - size / 2;
-          const dy = y - size / 2;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist > 20 && dist < (size / 2) * 0.65) {
-            ctx.beginPath(); ctx.arc(x, y, 0.8, 0, Math.PI * 2); ctx.fill();
-          }
-        }
+      for (let y = startY; y <= endY; y += GRID_SIZE) {
+        strokeWarpedSegment(-GRID_SIZE, y, size + GRID_SIZE, y, SUB);
       }
       ctx.restore();
     };
@@ -344,30 +340,28 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
 
           const segmentAlpha = (0.2 + 0.8 * (i / snake.points.length)) * lifeAlpha;
 
-          ctx.beginPath();
           ctx.lineWidth = 4.0;
           ctx.strokeStyle = snake.color;
           ctx.globalAlpha = segmentAlpha * 0.2;
-          ctx.moveTo(p1.x, p1.y); ctx.lineTo(x2, y2); ctx.stroke();
+          strokeWarpedSegment(p1.x, p1.y, x2, y2, 10);
 
-          ctx.beginPath();
           ctx.lineWidth = 1.5;
           ctx.strokeStyle = snake.color;
           ctx.globalAlpha = segmentAlpha * 0.6;
-          ctx.moveTo(p1.x, p1.y); ctx.lineTo(x2, y2); ctx.stroke();
+          strokeWarpedSegment(p1.x, p1.y, x2, y2, 10);
 
-          ctx.beginPath();
           ctx.lineWidth = 0.8;
           ctx.strokeStyle = "#ffffff";
           ctx.globalAlpha = segmentAlpha * 0.9;
-          ctx.moveTo(p1.x, p1.y); ctx.lineTo(x2, y2); ctx.stroke();
+          strokeWarpedSegment(p1.x, p1.y, x2, y2, 10);
         }
         ctx.restore();
 
         const head = snake.points[snake.points.length - 1];
         const prev = snake.points[snake.points.length - 2] || head;
-        const hx = prev.x + (head.x - prev.x) * snake.progress;
-        const hy = prev.y + (head.y - prev.y) * snake.progress;
+        const rawHx = prev.x + (head.x - prev.x) * snake.progress;
+        const rawHy = prev.y + (head.y - prev.y) * snake.progress;
+        const [hx, hy] = warp(rawHx, rawHy);
 
         ctx.save();
         const headGlow = ctx.createRadialGradient(hx, hy, 0, hx, hy, 5);
@@ -376,7 +370,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         ctx.beginPath(); ctx.arc(hx, hy, 5, 0, Math.PI * 2); ctx.fill();
 
         ctx.fillStyle = "#fff"; ctx.globalAlpha = 1;
-        ctx.beginPath(); ctx.arc(hx, hy, 1.0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(hx, hy, 1.2, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       });
 
@@ -385,16 +379,18 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         const dy = pulse.y - size / 2;
         if (Math.sqrt(dx * dx + dy * dy) < 15) return;
 
+        const [px, py] = warp(pulse.x, pulse.y);
+
         ctx.save();
         ctx.beginPath();
-        const pGrad = ctx.createRadialGradient(pulse.x, pulse.y, 0, pulse.x, pulse.y, 6);
+        const pGrad = ctx.createRadialGradient(px, py, 0, px, py, 6);
         pGrad.addColorStop(0, "rgba(0, 255, 65, 0.8)");
         pGrad.addColorStop(1, "rgba(0, 255, 65, 0)");
         ctx.fillStyle = pGrad; ctx.globalAlpha = pulse.alpha * 0.4;
-        ctx.arc(pulse.x, pulse.y, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
 
         ctx.fillStyle = "#fff"; ctx.globalAlpha = pulse.alpha;
-        ctx.beginPath(); ctx.arc(pulse.x, pulse.y, 1.0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(px, py, 1.0, 0, Math.PI * 2); ctx.fill();
 
         ctx.restore();
         pulse.alpha -= 0.1 * dt_snakes;
