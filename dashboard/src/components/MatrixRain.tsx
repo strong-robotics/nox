@@ -16,7 +16,7 @@ const MatrixRain = () => {
 
     const characters = "0123456789ABCDEF";
     const fontSize = 16;
-    const columns = Math.floor(canvas.width / fontSize);
+    const columns = Math.floor(canvas.width / (fontSize * 2));
     const drops: number[] = [];
     const headChars: string[] = [];
 
@@ -29,7 +29,7 @@ const MatrixRain = () => {
     const draw = () => {
       // Сбрасываем тень перед заливкой фона, чтобы она не влияла на прозрачный прямоугольник
       ctx.shadowBlur = 0;
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; // Ускорил очистку, чтобы убрать "призрачные" полоски
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.font = `${fontSize}px monospace`;
@@ -39,7 +39,7 @@ const MatrixRain = () => {
         // Используем ТОТ ЖЕ САМЫЙ символ, чтобы не было "каши" из наложенных друг на друга букв.
         ctx.fillStyle = "#00553B"; // Темно-бирюзовый для хвоста
         ctx.shadowBlur = 0;
-        ctx.fillText(headChars[i], i * fontSize, (drops[i] - 1) * fontSize);
+        ctx.fillText(headChars[i], i * fontSize * 2, (drops[i] - 1) * fontSize);
 
         // 2. Генерируем новый символ для текущей головы капли
         const headText = characters.charAt(Math.floor(Math.random() * characters.length));
@@ -47,16 +47,16 @@ const MatrixRain = () => {
 
         // 3. Рисуем текущий символ (голову капли) белым с зеленым свечением
         ctx.fillStyle = "#FFFFFF";
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 4; // Уменьшил радиус, чтобы не копилась "муть" в колонках
         ctx.shadowColor = "#00FFBD";
-        ctx.fillText(headText, i * fontSize, drops[i] * fontSize);
+        ctx.fillText(headText, i * fontSize * 2, drops[i] * fontSize);
 
         // Сбрасываем каплю в начало при достижении низа
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           // Превращаем последнюю белую голову в зеленую перед сбросом капли
           ctx.fillStyle = "#00553B"; // Темно-бирюзовый для конца хвоста
           ctx.shadowBlur = 0;
-          ctx.fillText(headChars[i], i * fontSize, drops[i] * fontSize);
+          ctx.fillText(headChars[i], i * fontSize * 2, drops[i] * fontSize);
           drops[i] = 0;
         }
         drops[i]++;

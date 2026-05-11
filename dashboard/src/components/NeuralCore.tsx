@@ -411,7 +411,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
       style={{
         width: size,
         height: size,
-        background: "radial-gradient(circle at 50% 50%, #001a00 0%, #000000 100%)",
+        background: "radial-gradient(circle at 50% 50%, rgba(0, 26, 0, 0.7) 0%, rgba(0, 0, 0, 0.7) 100%)",
         border: "1px solid rgba(0, 255, 65, 0.3)",
         boxShadow: `
           inset 0 0 15px rgba(0, 255, 65, 0.2),

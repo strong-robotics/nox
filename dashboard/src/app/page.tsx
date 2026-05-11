@@ -12,10 +12,10 @@ const fmtTime = (iso: string) => {
 
 // --- CONFIGURATION ---
 const AGENTS = [
-  { id: "architect", label: "ARCHITECT", model: "Gemini Flash 3", status: "ACTIVE", time: "02:14:32", angle: 0, color: "#00FFBD", gradFrom: "#00FFBD", gradTo: "#008F11", icon: "architect" },
-  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: -90, color: "#00FFBD", gradFrom: "#00FFBD", gradTo: "#008F11", icon: "designer" },
-  { id: "developer", label: "DEVELOPER", model: "Claude", status: "INACTIVE", time: "", angle: 90, color: "#00FFBD", gradFrom: "#00FFBD", gradTo: "#008F11", icon: "developer" },
-  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: 180, color: "#00FFBD", gradFrom: "#00FFBD", gradTo: "#008F11", icon: "tester" },
+  { id: "architect", label: "ARCHITECT", model: "Gemini Flash 3", status: "ACTIVE", time: "02:14:32", angle: 0, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "architect" },
+  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: -90, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "designer" },
+  { id: "developer", label: "DEVELOPER", model: "Claude", status: "INACTIVE", time: "", angle: 90, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "developer" },
+  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: 180, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "tester" },
 ];
 
 const RING_DIAMETER = 0.403;
@@ -64,7 +64,7 @@ function AgentStatusCard({ agent }: { agent: any }) {
   const isWaiting = agent.status === "WAITING";
   const isLive = isActive || isWaiting;
 
-  const statusColor = isActive ? "text-[#00FFBD]" : isWaiting ? "text-yellow-400" : "text-[#00FFBD]/30";
+  const statusColor = (isActive || isWaiting) ? "text-[#00FF41]" : "text-[#00FFBD]/30";
   const glowClass = isActive ? "matrix-glow" : "";
 
   return (
@@ -87,7 +87,7 @@ function AgentStatusCard({ agent }: { agent: any }) {
         <div className="text-[13px] text-[#00FFBD]/40 truncate">{agent.model || "—"}</div>
         <div className="text-[12px] text-[#00FFBD]/50 tracking-wider">[{agent.env || ""}]</div>
         <div className="flex items-center gap-2 mt-1">
-          <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#00FFBD] animate-pulse shadow-[0_0_8px_#00FFBD]' : isWaiting ? 'bg-yellow-500' : 'bg-[#00FFBD]/10'}`} />
+          <div className={`w-1.5 h-1.5 rounded-full ${isActive || isWaiting ? 'bg-[#00FF41] animate-pulse shadow-[0_0_8px_#00FF41]' : 'bg-[#00FFBD]/10'}`} />
           <div className={`text-[12px] font-bold tracking-widest uppercase ${statusColor}`}>{stopping ? "STOPPING" : agent.status}</div>
         </div>
       </div>
@@ -343,10 +343,10 @@ export default function NoxDashboard() {
               <div key={t.id} className={`p-4 flex flex-col gap-1 border-b border-[#00FFBD]/10`}>
                 <div className="flex items-center gap-3">
                   <span className="text-[11px] text-[#00FFBD]/60 font-mono">{t.id}</span>
-                  <span className={`text-[13px] font-bold tracking-wider text-[#00FFBD] ${t.status === 'IN PROGRESS' ? 'matrix-text-glow' : ''}`}>{t.title}</span>
+                  <span className={`text-[13px] font-bold tracking-wider text-white ${t.status === 'IN PROGRESS' ? 'matrix-text-glow' : ''}`}>{t.title}</span>
                 </div>
                 <div className="flex justify-between items-center ml-6">
-                  <span className="text-[11px] text-[#00FFBD]/30 uppercase tracking-tighter">{t.desc}</span>
+                  <span className="text-[11px] text-[#00FFBD]/60 uppercase tracking-tighter">{t.desc}</span>
                   {t.status === 'IN PROGRESS' && <span className="text-[9px] animate-pulse text-[#00FFBD]">EXECUTING...</span>}
                 </div>
               </div>
@@ -385,15 +385,15 @@ export default function NoxDashboard() {
                 {currentAgents.map((s: any, i: number) => (
                   <div key={s.id} className="flex items-center gap-4 relative">
                     <div className={`matrix-notched-new no-corners w-8 h-8 flex items-center justify-center text-[11px] font-bold z-10 transition-all 
-                      ${s.status === 'ACTIVE' ? 'bg-[#00FFBD] text-black shadow-[0_0_15px_#00FFBD]' : 'bg-black text-[#00FFBD]/60'}`}
+                      ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'bg-[#00FF41] text-black shadow-[0_0_15px_#00FF41]' : 'bg-black text-[#00FFBD]/60'}`}
                       style={{ '--notch-size': '4px' } as any}>
                       0{i + 1}
                     </div>
                     <div className="flex flex-col z-10">
-                      <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' ? 'text-[#00FFBD] matrix-text-glow' : 'text-[#00FFBD]/40'}`}>
+                      <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'text-[#00FFBD] matrix-text-glow' : 'text-[#00FFBD]/40'}`}>
                         {s.label}
                       </div>
-                      <div className={`text-[11px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' ? 'text-[#00FFBD]/80' : 'text-[#00FFBD]/20'}`}>
+                      <div className={`text-[11px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'text-[#00FF41]/80' : 'text-[#00FFBD]/20'}`}>
                         {s.status}
                       </div>
                     </div>
