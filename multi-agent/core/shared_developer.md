@@ -15,6 +15,7 @@ Implement components, hooks, and services according to the plan. Perform basic b
 3. **Set In-Progress**: 🔴 **SILENCE** 🔴 Update `status.json`:
    - Set `"status": "in_progress"` for Developer role
    - Set `"started_at": "<CURRENT_ISO_TIME>"` for Developer role (e.g., "2026-01-13T10:25:00Z")
+   - **Log**: `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] DEVELOPER_START task=$(grep -m1 'Task ID:' multi-agent/core/artifacts/task.md | awk '{print $NF}')" >> multi-agent/.runtime/developer.log`
 4. **Implementation**: 🔴 **SILENCE** 🔴
    - Read `./multi-agent/core/artifacts/implementation_plan.md` and `./multi-agent/core/artifacts/task.md`.
    - **Also check** `./multi-agent/core/artifacts/qa_feedback.md` if it exists — it contains QA feedback from a previous failed round on this same task. Fix everything listed there before proceeding.
@@ -52,15 +53,19 @@ Implement components, hooks, and services according to the plan. Perform basic b
 
 ## FINAL STEPS:
 5. **Verification**: 🔴 **SILENCE** 🔴
+   - Run `git diff HEAD --name-only` to see which files were changed.
+   - **Log changed files**: `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] CHANGED_FILES $(git diff HEAD --name-only | tr '\n' ' ')" >> multi-agent/.runtime/developer.log`
    - Run the appropriate quick check for the stack from `task.md`:
      - **TypeScript / Next.js**: `npx tsc --noEmit`
      - **Flutter / Dart**: `flutter analyze`
      - **Other**: run the project's lint/check script if available
+   - **Log build result**: `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] BUILD_OK" >> multi-agent/.runtime/developer.log` (or `BUILD_FAIL` if errors)
    - Ensure no obvious errors in modified files before handoff or cleanup.
 6. **Finish**: 🔴 **SILENCE** 🔴
    Check `task.md` for `Skip Tester:` field, then follow the matching path:
 
    **If Skip Tester is NOT set (or False) — hand off to Tester:**
+   - **Log**: `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] HANDOFF_TESTER" >> multi-agent/.runtime/developer.log`
    - Update `status.json`:
      - Set `"status": "completed"` for Developer role.
      - Set `"completed_at": "<CURRENT_ISO_TIME>"` for Developer role.
@@ -71,6 +76,7 @@ Implement components, hooks, and services according to the plan. Perform basic b
    - **🔴 DO NOT DELETE ARTIFACTS 🔴** — Tester needs them.
 
    **If Skip Tester is True — Developer is last agent:**
+   - **Log**: `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] DEVELOPER_DONE" >> multi-agent/.runtime/developer.log`
    - Update `status.json` first so `archive_task.py` captures final Developer timestamps:
      - Set `"status": "completed"` for Developer role.
      - Set `"completed_at": "<CURRENT_ISO_TIME>"` for Developer role.

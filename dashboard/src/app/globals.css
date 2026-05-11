@@ -2,11 +2,85 @@
 
 :root {
   --background: #000000;
-  --foreground: #ffffff;
+  --foreground: #00FF41;
+  --matrix-green: #00FF41;
+  --matrix-green-glow: rgba(0, 255, 65, 0.4);
+  --matrix-green-dark: #003B00;
+  --matrix-green-dim: rgba(0, 255, 65, 0.15);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', ui-monospace, monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* Matrix Scanline Effect */
+body::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 9999;
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+}
+
+/* Flicker Animation */
+@keyframes flicker {
+  0% {
+    opacity: 0.97;
+  }
+
+  5% {
+    opacity: 0.95;
+  }
+
+  10% {
+    opacity: 0.9;
+  }
+
+  15% {
+    opacity: 0.95;
+  }
+
+  25% {
+    opacity: 0.98;
+  }
+
+  30% {
+    opacity: 0.95;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.matrix-glow {
+  text-shadow: 0 0 5px var(--matrix-green), 0 0 10px var(--matrix-green-glow);
+}
+
+.matrix-border {
+  border: 1px solid var(--matrix-green);
+  box-shadow: 0 0 10px var(--matrix-green-glow), inset 0 0 5px var(--matrix-green-dim);
+}
+
+.matrix-card {
+  background: rgba(0, 20, 0, 0.8);
+  border: 1px solid var(--matrix-green-dim);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.matrix-card:hover {
+  border-color: var(--matrix-green);
+  box-shadow: 0 0 15px var(--matrix-green-glow);
 }

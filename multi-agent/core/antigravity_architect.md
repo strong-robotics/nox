@@ -11,10 +11,10 @@
 - Scripts: `antigravity_wait_for_...`
 - Paths: Relative to project root (`./multi-agent/core/...`)
 
-## TEAM CONFIGURATION (edit to match your actual setup):
-- Designer Chat Name: "Antigravity Designer"
-- Developer Chat Name: "Codex Developer"
-- Tester Chat Name: "Antigravity Tester"
+## TEAM CONFIGURATION:
+- Designer Chat Name: "Designer"
+- Developer Chat Name: "Developer"
+- Tester Chat Name: "Tester"
 
 ### STARTUP — Write PID file (run once before Step 1):
 ```bash

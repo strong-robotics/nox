@@ -189,10 +189,47 @@ Ensure that the JSON is perfectly valid and is an object containing the `"pipeli
 - **DRY Planning**: If similar logic exists elsewhere, reference it as a template
 
 ## BEST PRACTICES for implementation_plan.md:
-- **Clear File Links**: Use `[basename](file:///path/to/file)` format
-- **Specific Instructions**: Provide logical steps that a Developer can follow without guessing
-- **Dependency Map**: Clearly state if a new component depends on a specific GraphQL query or custom hook
-- **Anti-Duplication**: Explicitly forbid creating new labels/buttons if project standards already provide them
+
+Always write `implementation_plan.md` using this exact structure. Every section is mandatory.
+
+```md
+# Implementation Plan: <Task Title>
+
+## Goal
+<Technical goal in imperative form. What must exist after this task is done.>
+
+## Owns (Files to Create/Modify)
+- **Create**: `path/to/file` — <why>
+- **Modify**: `path/to/file` — <what changes>
+
+## Integrates Into
+- `path/to/entry_point` — <how this connects to existing code>
+
+## Implementation Details
+- **Stack**: <Flutter / Next.js / PHP / etc — from task.md>
+- **Approach**: <step-by-step technical plan, specific enough that developer has no ambiguity>
+- **Key constraints**: <coding rules, naming conventions, forbidden patterns>
+- **Reuse**: <existing hooks/components/classes to use instead of creating new>
+
+## [CHECK] Acceptance Criteria (For Tester)
+
+### 1. <Category — e.g. File Structure>
+- [ ] <specific, verifiable criterion — not vague>
+- [ ] <criterion>
+
+### 2. <Category — e.g. Behavior>
+- [ ] <criterion>
+
+### 3. Constraints
+- [ ] No debug output (`print`, `console.log`, `var_dump`, TODO comments)
+- [ ] No hardcoded strings where constants/keys should be used
+- [ ] Build/lint passes (or skip note if tool unavailable)
+```
+
+Rules:
+- **`[CHECK]` section is the most important** — tester uses it as a checklist. Make criteria specific and binary (pass/fail), not vague ("code is clean").
+- **Owns** lists exact file paths, not descriptions.
+- **No free-form prose** — use the structure above.
 
 ---
 

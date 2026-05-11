@@ -1,17 +1,21 @@
-# Implementation Plan: Create Yellow Cube Button Widget with Icon
+# Implementation Plan: Yellow Cube Button Widget with Icon
 
 ## Task
-Create a Flutter StatelessWidget named `YellowCubeButton`.
+Create a Flutter `YellowCubeButton` StatelessWidget in `test/yellow_cube_button.dart`.
 
-## Target File
+## Reference
+- `test/blue_cube_button.dart` — centered child inside Container pattern
+
+## File to Create
 `test/yellow_cube_button.dart`
 
 ## Requirements
-- Widget class: `YellowCubeButton` extends `StatelessWidget`
-- An 80x80 square using `BoxDecoration` with `color: Colors.yellow`
-- Centered `Icon(Icons.star, color: Colors.white, size: 32)`
-- On tap: prints `"Yellow pressed"` to console via `print()`
-- No external dependencies (only `package:flutter/material.dart`)
+- Widget class: `YellowCubeButton` (StatelessWidget)
+- Dimensions: 80×80
+- Appearance: solid yellow square via `BoxDecoration(color: Colors.yellow)`
+- Centered `Icons.star` icon, color: Colors.white, size: 32
+- Behavior: on tap → `print("Yellow pressed")`
+- No external package dependencies (Flutter SDK only)
 
 ## Implementation
 
@@ -31,11 +35,12 @@ class YellowCubeButton extends StatelessWidget {
         decoration: const BoxDecoration(
           color: Colors.yellow,
         ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.star,
-          color: Colors.white,
-          size: 32,
+        child: const Center(
+          child: Icon(
+            Icons.star,
+            color: Colors.white,
+            size: 32,
+          ),
         ),
       ),
     );
@@ -44,5 +49,6 @@ class YellowCubeButton extends StatelessWidget {
 ```
 
 ## Notes
-- Icon replaces text label
-- `test/` directory already exists
+- Use `Icon` widget (not `Text`) for the centered child.
+- `Icons.star` available via `package:flutter/material.dart` — no extra imports.
+- Same GestureDetector + Container pattern as previous tasks.

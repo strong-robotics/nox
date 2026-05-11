@@ -65,7 +65,7 @@ def display_dashboard():
                 by_env = {}
                 for a in agents:
                     by_env.setdefault(a["env"], []).append(a)
-                for env in ("cursor", "antigravity", "codex"):
+                for env in ("cursor", "antigravity", "codex", "codex_app"):
                     if env not in by_env:
                         continue
                     print(f"  [{env.upper()}]")
@@ -85,6 +85,22 @@ def display_dashboard():
                     if ca["events"]:
                         for ev in ca["events"][-3:]:
                             print(f"       › {truncate(ev, 88)}")
+
+            # ── Codex.app chat state ────────────────────────────────────────
+            codex_app_agents = state.get("codex_app_agents", [])
+            if codex_app_agents:
+                print("=" * 100)
+                print(" CODEX.APP CHAT AGENTS")
+                for agent in codex_app_agents:
+                    icon = agent_icon(agent.get("alive"))
+                    signal = "signal" if agent.get("signal_received") else "no-signal"
+                    pid = agent.get("pid") or "-"
+                    current = agent.get("current_status") or "-"
+                    updated = agent.get("last_updated") or "-"
+                    print(
+                        f"  {icon}  {agent['role']:<12} {agent['state']:<16} "
+                        f"PID {str(pid):<8} {signal:<9} current={current:<12} updated={updated}"
+                    )
 
             # ── cursor events ────────────────────────────────────────────────
             cursor_events = state.get("cursor_events", [])

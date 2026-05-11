@@ -3,24 +3,22 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import NeuralCore from "@/components/NeuralCore";
 
+const fmtTime = (iso: string) => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+};
+
 // --- CONFIGURATION ---
 const AGENTS = [
-  { id: "architect", label: "ARCHITECT", model: "Gemini Flash 3", status: "ACTIVE", time: "02:14:32", angle: 0, color: "#FF5C5C", gradFrom: "#FF8E8E", gradTo: "#FF5C5C", icon: "architect" },
-  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: -90, color: "#FFB547", gradFrom: "#FFCC85", gradTo: "#FFB547", icon: "designer" },
-  { id: "developer", label: "DEVELOPER", model: "Claude", status: "INACTIVE", time: "", angle: 90, color: "#7C5CFF", gradFrom: "#A08EFF", gradTo: "#7C5CFF", icon: "developer" },
-  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: 180, color: "#27D69E", gradFrom: "#3BE3AC", gradTo: "#27D69E", icon: "tester" },
-];
-
-const TASKS = [
-  { id: "01", title: "Create a red cube button widget", desc: "Flutter Stack", status: "IN PROGRESS", time: "02:14:32", color: "#FF5C5C" },
-  { id: "02", title: "Create a blue cube button widget", desc: "Flutter Stack", status: "QUEUED", time: "Queued", color: "#7C5CFF" },
-  { id: "03", title: "Create a green cube button widget with counter", desc: "Flutter Stack", status: "QUEUED", time: "Queued", color: "#27D69E" },
-  { id: "04", title: "Create a yellow cube button widget with icon", desc: "Flutter Stack", status: "QUEUED", time: "Queued", color: "#FFB547" },
-  { id: "05", title: "Create a purple cube button that disables after 3 taps", desc: "Flutter Stack", status: "QUEUED", time: "Queued", color: "#A08EFF" },
+  { id: "architect", label: "ARCHITECT", model: "Gemini Flash 3", status: "ACTIVE", time: "02:14:32", angle: 0, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "architect" },
+  { id: "designer", label: "DESIGNER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: -90, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "designer" },
+  { id: "developer", label: "DEVELOPER", model: "Claude", status: "INACTIVE", time: "", angle: 90, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "developer" },
+  { id: "tester", label: "TESTER", model: "Gemini Flash 3", status: "INACTIVE", time: "", angle: 180, color: "#00FF41", gradFrom: "#00FF41", gradTo: "#008F11", icon: "tester" },
 ];
 
 const RING_DIAMETER = 0.403;
-const RING_THICKNESS = 0.008;
+const RING_THICKNESS = 0.004;
 const DASH_DIAMETER = 0.533;
 const ARROW_INNER = 0.142;
 const ARROW_LEN = 0.045;
@@ -28,13 +26,13 @@ const ARROW_LEN = 0.045;
 // --- COMPONENTS ---
 
 function Icon({ kind }: { kind: string }) {
-  const s = { width: 20, height: 20, stroke: "#fff", strokeWidth: 2, fill: "none", strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  const s = { width: 18, height: 18, stroke: "currentColor", strokeWidth: 1.5, fill: "none", strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   if (kind === "architect") return (
     <svg viewBox="0 0 24 24" {...s}>
-      <rect x="9" y="3.5" width="6" height="5" rx="1.2" />
-      <rect x="3" y="15.5" width="5" height="5" rx="1.2" />
-      <rect x="9.5" y="15.5" width="5" height="5" rx="1.2" />
-      <rect x="16" y="15.5" width="5" height="5" rx="1.2" />
+      <rect x="9" y="3.5" width="6" height="5" rx="1" />
+      <rect x="3" y="15.5" width="5" height="5" rx="1" />
+      <rect x="9.5" y="15.5" width="5" height="5" rx="1" />
+      <rect x="16" y="15.5" width="5" height="5" rx="1" />
       <path d="M12 8.5v3M5.5 15.5v-1.5h13V15.5M12 14v1.5" />
     </svg>
   );
@@ -59,64 +57,57 @@ function Icon({ kind }: { kind: string }) {
   return null;
 }
 
-function AgentStatusCard({ agent }: { agent: typeof AGENTS[0] }) {
+function AgentStatusCard({ agent }: { agent: any }) {
   const [stopping, setStopping] = useState(false);
-  const isActive  = agent.status === "ACTIVE";
+  const isActive = agent.status === "ACTIVE";
   const isWaiting = agent.status === "WAITING";
-  const isLive    = isActive || isWaiting;
-  const dotColor  = stopping ? "bg-red-400 animate-pulse" : isActive ? "bg-green-400" : isWaiting ? "bg-yellow-400 animate-pulse" : "bg-slate-300";
-  const textColor = stopping ? "text-red-400" : isActive ? "text-green-500" : isWaiting ? "text-yellow-500" : "text-slate-400";
-  const statusLabel = stopping ? "STOPPING" : agent.status;
+  const isLive = isActive || isWaiting;
 
-  const handleStop = async () => {
-    const agentId = (agent as any).agentId ?? (agent as any).pid;
-    if (!agentId) return;
-    setStopping(true);
-    await fetch("http://localhost:777/kill-agent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pid: agentId, role: agent.id }),
-    }).catch(() => {});
-    setStopping(false);
-  };
+  const statusColor = isActive ? "text-[#00FF41]" : isWaiting ? "text-yellow-400" : "text-gray-600";
+  const glowClass = isActive ? "matrix-glow" : "";
 
   return (
-    <div className="bg-white rounded-xl p-5 flex-1 shadow-[0_4px_16px_rgba(0,0,0,0.06)] flex items-center gap-4 min-w-[220px]">
-      <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${agent.gradFrom}, ${agent.gradTo})` }}>
+    <div className={`matrix-card relative flex-1 p-4 border border-[#00FF41]/20 flex items-center gap-4 overflow-hidden group`}>
+      {/* Scanline overlay for the card */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00FF41]/5 to-transparent bg-[length:100%_4px] pointer-events-none opacity-20" />
+
+      <div className={`w-10 h-10 rounded border border-[#00FF41]/40 flex items-center justify-center text-[#00FF41] flex-shrink-0 bg-black/40 ${isActive ? 'shadow-[0_0_10px_rgba(0,255,65,0.3)]' : ''}`}>
         <Icon kind={agent.icon} />
       </div>
-      <div className="flex flex-col gap-1 flex-1 min-w-0">
-        <div className="flex flex-col">
-          <div className="text-[12px] font-bold text-[#1a2b4b] tracking-wider uppercase">{agent.label}</div>
-          <div className="text-[10px] text-[#52525b] font-medium">{agent.model}</div>
-        </div>
-        <div className="flex items-center gap-3 mt-1">
-          <div className="flex items-center gap-1.5">
-            <div className={`w-1.5 h-1.5 rounded-full ${dotColor} ${isWaiting ? 'animate-pulse' : ''}`} />
-            <div className={`text-[9px] font-bold uppercase ${textColor}`}>{statusLabel}</div>
-          </div>
-          {isLive && ((agent as any).agentId || (agent as any).pid) && (
-            <div className="text-[9px] font-mono text-slate-400">#{(agent as any).agentId ?? (agent as any).pid}</div>
+
+      <div className="flex flex-col gap-0.5 flex-1 min-w-0 z-10">
+        <div className="flex justify-between items-start">
+          <div className={`text-[11px] font-bold tracking-[0.2em] uppercase ${statusColor} ${glowClass}`}>{agent.label}</div>
+          {isLive && (agent.agentId || agent.pid) && (
+            <div className="text-[9px] font-mono text-[#00FF41]/40">#{agent.agentId ?? agent.pid}</div>
           )}
         </div>
+        <div className="text-[10px] text-gray-400 truncate">{agent.model} {agent.env ? `[${agent.env}]` : ""}</div>
+        <div className="flex items-center gap-2 mt-1">
+          <div className={`w-1 h-1 rounded-full ${isActive ? 'bg-[#00FF41] animate-pulse shadow-[0_0_5px_#00FF41]' : isWaiting ? 'bg-yellow-500' : 'bg-gray-700'}`} />
+          <div className={`text-[9px] font-bold tracking-widest uppercase ${statusColor}`}>{stopping ? "STOPPING" : agent.status}</div>
+        </div>
       </div>
-      {isLive && ((agent as any).pid || (agent as any).agentId) && (
+
+      {isLive && (agent.pid || agent.agentId) && (
         <button
-          onClick={handleStop}
-          title="Stop agent"
-          className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center bg-red-50 hover:bg-red-100 transition-colors"
+          onClick={async () => {
+            setStopping(true);
+            await fetch("http://localhost:777/kill-agent", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ pid: agent.agentId ?? agent.pid, role: agent.id }),
+            }).catch(() => { });
+            setStopping(false);
+          }}
+          className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center border border-red-900/50 hover:bg-red-950/30 text-red-500"
         >
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="#ef4444">
-            <rect x="1" y="1" width="8" height="8" rx="1.5" />
-          </svg>
+          <span className="text-[10px]">×</span>
         </button>
       )}
     </div>
   );
 }
-
-
-
 
 export default function NoxDashboard() {
   const [mounted, setMounted] = useState(false);
@@ -127,7 +118,6 @@ export default function NoxDashboard() {
   const ringGradRef = useRef<SVGSVGElement>(null);
   const orbitDashedRef = useRef<HTMLDivElement>(null);
   const orbitDotsRef = useRef<HTMLDivElement>(null);
-  const brainRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
   const tileRefs = useRef<Record<string, { wrap: HTMLDivElement | null; card: HTMLDivElement | null; halo: HTMLDivElement | null }>>({});
@@ -139,8 +129,8 @@ export default function NoxDashboard() {
   useEffect(() => {
     setMounted(true);
     const ws = new WebSocket("ws://localhost:777/ws");
-    ws.onmessage = (e) => { 
-      const data = JSON.parse(e.data); 
+    ws.onmessage = (e) => {
+      const data = JSON.parse(e.data);
       if (data.state) setState(data.state);
       setFullState(data);
     };
@@ -149,24 +139,19 @@ export default function NoxDashboard() {
   }, []);
 
   const AGENT_META: Record<string, any> = {
-    architect: { label: "ARCHITECT", angle: 0, color: "#FF5C5C", gradFrom: "#FF8E8E", gradTo: "#FF5C5C", icon: "architect" },
-    designer: { label: "DESIGNER", angle: -90, color: "#FFB547", gradFrom: "#FFCC85", gradTo: "#FFB547", icon: "designer" },
-    developer: { label: "DEVELOPER", angle: 90, color: "#7C5CFF", gradFrom: "#A08EFF", gradTo: "#7C5CFF", icon: "developer" },
-    tester: { label: "TESTER", angle: 180, color: "#27D69E", gradFrom: "#3BE3AC", gradTo: "#27D69E", icon: "tester" },
+    architect: { label: "ARCHITECT", angle: 0, color: "#00FF41", icon: "architect" },
+    designer: { label: "DESIGNER", angle: -90, color: "#00FF41", icon: "designer" },
+    developer: { label: "DEVELOPER", angle: 90, color: "#00FF41", icon: "developer" },
+    tester: { label: "TESTER", angle: 180, color: "#00FF41", icon: "tester" },
   };
 
   const resolveAgentStatus = (pipelineStatus: string, role: string): string => {
     if (pipelineStatus === "in_progress") return "ACTIVE";
-    if (pipelineStatus === "completed")   return "DONE";
-    if (pipelineStatus === "ready")       return "READY";
-    if (pipelineStatus === "waiting") {
-      const liveAgents: any[] = fullState?.live_agents || [];
-      const isAlive = liveAgents.some(
-        (a: any) => a.role.toLowerCase() === role.toLowerCase() && a.alive
-      );
-      return isAlive ? "WAITING" : "INACTIVE";
-    }
-    return "INACTIVE";
+    const liveAgents: any[] = fullState?.live_agents || [];
+    const isAlive = liveAgents.some(
+      (a: any) => a.role.toLowerCase() === role.toLowerCase() && a.alive
+    );
+    return isAlive ? "WAITING" : "INACTIVE";
   };
 
   const currentAgents = useMemo(() => {
@@ -182,31 +167,43 @@ export default function NoxDashboard() {
         (a: any) => a.role.toLowerCase() === role && a.alive
       );
       const env = liveAgent?.env;
-      if (role === "architect") return env === "antigravity" ? "Gemini" : "Claude";
+      const envModel = (e: string | undefined) => {
+        if (e === "antigravity") return "Gemini";
+        if (e === "cursor") return "Claude";
+        if (e === "codex_app") return "Codex";
+        return null;
+      };
+      if (role === "architect") return envModel(env) ?? "Claude";
       if (role === "developer") {
-        if (env === "antigravity") return "Gemini";
-        if (env === "cursor") return "Claude";
         if (env === "codex") {
           const m = (fullState.codex_agents || []).find((a: any) => a.role === "developer")?.model;
           return m && m !== "unknown" ? m : "Codex";
         }
-        return "Codex";
+        return envModel(env) ?? "Codex";
       }
-      if (role === "designer" || role === "tester") return env === "cursor" ? "Claude" : "Gemini";
+      if (role === "designer" || role === "tester") return envModel(env) ?? "Gemini";
       return "—";
     };
 
     const liveAgentsAll: any[] = fullState?.live_agents || [];
     return fullState.pipeline.map((p: any) => {
-      const meta = AGENT_META[p.role.toLowerCase()] || { label: p.role.toUpperCase(), angle: 0, color: "#7C5CFF", gradFrom: "#A08EFF", gradTo: "#7C5CFF", icon: "developer" };
+      const meta = AGENT_META[p.role.toLowerCase()] || { label: p.role.toUpperCase(), angle: 0, color: "#00FF41", icon: "developer" };
       const liveAgent = liveAgentsAll.find(
         (a: any) => a.role.toLowerCase() === p.role.toLowerCase() && a.alive
       );
+      const envLabel = (e: string | undefined) => {
+        if (e === "cursor") return "Cursor";
+        if (e === "antigravity") return "Antigravity";
+        if (e === "codex") return "Codex";
+        if (e === "codex_app") return "Codex.app";
+        return null;
+      };
       return {
         id: p.role,
         ...meta,
         status: resolvedStatus(p),
         model: resolveModel(p),
+        env: envLabel(liveAgent?.env),
         time: p.started_at || "",
         pid: liveAgent?.pid ?? null,
         agentId: liveAgent?.kill_pid ?? null,
@@ -221,13 +218,13 @@ export default function NoxDashboard() {
   const isActiveTask = !!(fullState?.current_task && fullState.current_task !== "None" && fullState.current_task !== "N/A");
 
   const currentTasks = useMemo(() => {
-    if (!fullState || !fullState.tasks || !fullState.tasks.all_queued?.length) return TASKS;
+    if (!fullState || !fullState.tasks || !fullState.tasks.all_queued?.length) return [];
     return fullState.tasks.all_queued.map((t: any, i: number) => ({
       id: `0${i + 1}`,
       title: t.action || t,
       desc: t.stack ? `${t.stack} Stack` : "Queued",
       status: isActiveTask && i === 0 ? "IN PROGRESS" : "QUEUED",
-      color: isActiveTask && i === 0 ? "#FF5C5C" : "#7C5CFF"
+      color: "#00FF41"
     }));
   }, [fullState, isActiveTask]);
 
@@ -254,17 +251,14 @@ export default function NoxDashboard() {
       const stage = stageSizeRef.current;
       if (!stage) { raf = requestAnimationFrame(tick); return; }
 
-      const orbitPeriod = 90;
-      const dashSpeed = 240;
+      const orbitPeriod = 120;
       const dashDVal = stage * DASH_DIAMETER;
-      const baseR = (dashDVal - 1.5) / 2; // Center of the 1.5px dashed border
+      const baseR = (dashDVal - 1.5) / 2;
       const orbitRot = (t * 360) / orbitPeriod;
 
-      // Tiles & Halos
       agentsRef.current.forEach((a: any) => {
         const refs = tileRefs.current[a.id];
         if (!refs || !refs.wrap) return;
-        const phase = (a.angle * Math.PI) / 180;
         const currentAngleDeg = (a.angle + orbitRot) % 360;
         const ang = (currentAngleDeg * Math.PI) / 180;
         const r = baseR;
@@ -273,36 +267,27 @@ export default function NoxDashboard() {
         refs.wrap.style.transform = `translate3d(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px), 0)`;
 
         if (refs.card) {
-          const s = 1 + Math.sin((t * 2 * Math.PI) / 5 + phase) * 0.018;
+          const s = 1 + Math.sin((t * 2 * Math.PI) / 8 + a.angle) * 0.015;
           refs.card.style.transform = `translate3d(-50%, -50%, 0) scale(${s.toFixed(4)})`;
         }
         if (refs.halo) {
-          const op = 0.55 + Math.sin((t * 2 * Math.PI) / 4 + phase) * 0.12;
+          const op = 0.4 + Math.sin((t * 2 * Math.PI) / 6 + a.angle) * 0.1;
           refs.halo.style.opacity = String(Math.max(0, op));
         }
 
-        // Update Arrow Rotation
         const arrowRefsObj = arrowRefs.current[a.id];
         if (arrowRefsObj && arrowRefsObj.wrap) {
           arrowRefsObj.wrap.style.transform = `translate(-50%, -50%) rotate(${currentAngleDeg.toFixed(2)}deg)`;
-          if (arrowRefsObj.line) arrowRefsObj.line.style.opacity = "0.4";
-          if (arrowRefsObj.head) arrowRefsObj.head.style.opacity = "0.7";
         }
       });
 
-      // Ring Rotation
       if (ringGradRef.current) {
-        ringGradRef.current.style.transform = `translate(-50%, -50%) rotate(${orbitRot.toFixed(2)}deg)`;
+        ringGradRef.current.style.transform = `rotate(${orbitRot.toFixed(2)}deg)`;
+        ringGradRef.current.style.transformOrigin = "center center";
       }
 
-      // Dashed Orbit
-      const dashAngle = (-(t * 360) / dashSpeed).toFixed(2);
-      if (orbitDashedRef.current) orbitDashedRef.current.style.transform = `translate3d(-50%, -50%, 0) rotate(${dashAngle}deg)`;
-      if (orbitDotsRef.current) orbitDotsRef.current.style.transform = `translate3d(-50%, -50%, 0) rotate(${dashAngle}deg)`;
-
-      // Brain & Title
-      if (brainRef.current) brainRef.current.style.transform = `scale(${(1 + Math.sin((t * 2 * Math.PI) / 7) * 0.025).toFixed(4)})`;
-      if (titleRef.current) titleRef.current.style.opacity = String(0.85 + Math.sin((t * 2 * Math.PI) / 5) * 0.08);
+      if (orbitDashedRef.current) orbitDashedRef.current.style.transform = `translate3d(-50%, -50%, 0) rotate(${(-(t * 360) / 300).toFixed(2)}deg)`;
+      if (orbitDotsRef.current) orbitDotsRef.current.style.transform = `translate3d(-50%, -50%, 0) rotate(${(-(t * 360) / 300).toFixed(2)}deg)`;
 
       raf = requestAnimationFrame(tick);
     };
@@ -317,135 +302,93 @@ export default function NoxDashboard() {
   const outerR = ringD / 2;
   const arrowInner = stageSize * ARROW_INNER;
   const arrowLen = stageSize * ARROW_LEN;
-  if (!mounted) return <main className="min-h-screen bg-[#F4F5F8]" />;
+
+  if (!mounted) return <main className="min-h-screen bg-black" />;
 
   return (
-    <main className="relative w-full h-screen bg-[#F4F5F8] font-sans overflow-hidden">
+    <main className="relative w-full h-screen bg-black text-[#00FF41] font-mono overflow-hidden">
       <style dangerouslySetInnerHTML={{
         __html: `
-        .orbit-dashed { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.5px dashed #B8BCCF; opacity: 0.85; will-change: transform; }
-        .orbit-dot { position: absolute; left: 0; top: 0; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: #C9CAE6; }
+        .orbit-dashed { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1px dashed rgba(0, 255, 65, 0.2); will-change: transform; }
+        .orbit-dot { position: absolute; left: 0; top: 0; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: rgba(0, 255, 65, 0.5); box-shadow: 0 0 5px #00FF41; }
         .tile-wrap { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; will-change: transform; }
-        .tile-card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 6px; will-change: transform; }
-        .tile-halo { position: absolute; left: 50%; top: 20px; transform: translate(-50%, -50%); width: 80px; height: 80px; border-radius: 50%; filter: blur(8px); will-change: opacity; }
-        .tile { position: relative; z-index: 1; background: #fff; border-radius: 14px; padding: 8px; shadow: 0 18px 38px -18px rgba(43,47,74,0.28); }
-        .arrow-line { position: absolute; top: -1px; height: 2px; border-radius: 2px; will-change: opacity; }
-        .arrow-head { position: absolute; top: -5px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid; will-change: opacity; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E4F0; border-radius: 10px; }
+        .tile-card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 4px; will-change: transform; }
+        .tile-halo { position: absolute; left: 50%; top: 15px; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; filter: blur(10px); will-change: opacity; }
+        .arrow-line { position: absolute; top: -0.5px; height: 1px; will-change: opacity; }
+        .arrow-head { position: absolute; top: -3px; width: 0; height: 0; border-top: 3px solid transparent; border-bottom: 3px solid transparent; border-left: 5px solid; will-change: opacity; }
+        .custom-scrollbar::-webkit-scrollbar { width: 2px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00FF41; }
+        .matrix-text-glow { text-shadow: 0 0 8px #00FF41; }
       `}} />
 
-      {/* HEADER BLOCK (Absolute) */}
-      <div className="absolute top-6 left-6 right-6 h-fit flex items-center gap-4 z-50 pointer-events-none">
-        <div className="flex gap-4 w-full pointer-events-auto">
+      {/* HEADER BLOCK */}
+      <div className="absolute top-6 left-6 right-6 h-fit flex items-center gap-4 z-50">
+        <div className="flex gap-4 w-full">
           {currentAgents.map((a: any) => (
             <AgentStatusCard key={a.id} agent={a} />
           ))}
         </div>
       </div>
 
-      {/* TASK QUEUE SIDEBAR */}
-      <div className="absolute left-6 top-[152px] bottom-6 w-[340px] flex flex-col z-40">
-        <div className="mb-2 ml-2 text-[12px] font-bold text-[#52525b] uppercase tracking-wider">TASK QUEUE</div>
-
-        <div className="flex-1 overflow-hidden border-2 border-dashed border-[#B8BCCF]/80 rounded-xl flex flex-col bg-white/10">
-          <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
-            <div className="flex flex-col">
-              {currentTasks.length > 0 ? currentTasks.map((t: any, i: number) => (
-                <div key={t.id} className={`p-4 flex items-center ${i < currentTasks.length - 1 ? 'border-b border-dashed border-[#B8BCCF]' : ''}`}>
-                  <div className="flex items-center gap-4 w-full">
-                    <div className="text-lg font-bold text-[#3D7BFF] min-w-[28px]">{t.id}</div>
-                    <div className="flex flex-col justify-center">
-                      <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">{t.title}</div>
-                      <div className="text-[11px] text-[#52525b] font-medium mt-0.5 leading-relaxed">{t.desc}</div>
-                      {t.status === 'IN PROGRESS' && (
-                        <div className="flex items-center gap-4 mt-2">
-                          <div className="text-[9px] font-mono text-slate-400 font-bold uppercase">{t.time || "Active"}</div>
-                          <div className="text-[9px] font-bold uppercase text-green-500">{t.status}</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+      {/* LEFT SIDEBAR - TASK QUEUE */}
+      <div className="absolute left-6 top-[140px] bottom-6 w-[320px] flex flex-col z-40">
+        <div className="mb-2 px-2 text-[10px] font-bold text-[#00FF41] uppercase tracking-[0.3em] matrix-text-glow">SYSTEM.QUEUE //</div>
+        <div className="flex-1 overflow-hidden border border-[#00FF41]/30 bg-black/60 backdrop-blur-md rounded flex flex-col">
+          <div className="flex-1 overflow-y-auto p-0 custom-scrollbar">
+            {currentTasks.map((t: any, i: number) => (
+              <div key={t.id} className={`p-4 flex flex-col gap-1 border-b border-[#00FF41]/10 hover:bg-[#00FF41]/5 transition-colors cursor-default`}>
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] text-[#00FF41]/60">{t.id}</span>
+                  <span className={`text-[12px] font-bold tracking-wider ${t.status === 'IN PROGRESS' ? 'text-[#00FF41] matrix-text-glow' : 'text-gray-400'}`}>{t.title}</span>
                 </div>
-              )) : (
-                <div className="flex flex-col items-center justify-center h-full py-20 px-6 text-center opacity-40">
-                  <div className="text-[11px] font-bold text-[#1a2b4b] uppercase tracking-[0.2em] mb-2">Idle System</div>
-                  <div className="text-[10px] text-[#52525b] leading-relaxed">Eugene, I'm standing by. Add a task to the queue to begin.</div>
+                <div className="flex justify-between items-center ml-6">
+                  <span className="text-[9px] text-gray-500 uppercase tracking-tighter">{t.desc}</span>
+                  {t.status === 'IN PROGRESS' && <span className="text-[8px] animate-pulse text-[#00FF41]">EXECUTING...</span>}
                 </div>
-              )}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       {/* RIGHT SIDEBAR - CURRENT TASK & PROGRESS */}
-      <div className="absolute right-6 top-[152px] bottom-6 w-[340px] flex flex-col z-40">
-        <div className="flex justify-between items-end mb-2 px-2">
-          <div className="text-[12px] font-bold text-[#52525b] uppercase tracking-wider">CURRENT TASK</div>
-        </div>
+      <div className="absolute right-6 top-[140px] bottom-6 w-[320px] flex flex-col z-40">
+        <div className="mb-2 px-2 text-[10px] font-bold text-[#00FF41] uppercase tracking-[0.3em] matrix-text-glow">CURRENT.PROCESS //</div>
+        <div className="flex-1 overflow-hidden border border-[#00FF41]/30 bg-black/60 backdrop-blur-md rounded p-5 flex flex-col gap-6">
 
-        <div className="flex-1 overflow-hidden border-2 border-dashed border-[#B8BCCF]/80 rounded-xl flex flex-col bg-white/10 p-5">
-          {/* Main Task Highlight */}
           {(() => {
             const queued = fullState?.tasks?.all_queued || [];
-            const activeTask = isActiveTask
-              ? (queued.find((t: any) => t.action === fullState.current_task) || null)
-              : null;
+            const activeTask = queued.length > 0 ? queued[0] : null;
             return (
-              <>
-                <div className="bg-white/70 rounded-xl p-4 mb-4 border border-white/50 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg ${isActiveTask ? "bg-blue-50 text-[#3D7BFF]" : "bg-slate-100 text-slate-400"}`}>
-                    {isActiveTask ? "▶" : "—"}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="text-[13px] font-bold text-[#1a2b4b] leading-tight">
-                      {isActiveTask ? fullState.current_task : "No Active Task"}
-                    </div>
-                    <div className="text-[11px] text-[#52525b] mt-0.5">
-                      {isActiveTask ? "Active Multi-Agent Stream" : "Idle"}
-                    </div>
-                  </div>
+              <div className="border border-[#00FF41]/20 p-4 bg-[#00FF41]/5">
+                <div className="text-[11px] font-bold text-[#00FF41] mb-2 leading-tight tracking-wide">
+                  {activeTask?.action || (isActiveTask ? fullState.current_task : "NO ACTIVE PROCESS")}
                 </div>
-                {isActiveTask && activeTask?.instructions && (
-                  <div className="px-1 mb-6">
-                    <div className="text-[12px] leading-relaxed text-[#52525b]">{activeTask.instructions}</div>
-                  </div>
-                )}
-              </>
+                <div className="text-[9px] leading-relaxed text-gray-400 font-light">
+                  {activeTask?.instructions || "System idling. Awaiting next command sequence..."}
+                </div>
+              </div>
             );
           })()}
 
-          <div className="mb-6 ml-1 text-[12px] font-bold text-[#52525b] uppercase tracking-wider">STEP PROGRESS</div>
-
-          <div className="flex-1 relative">
-            <div className="flex flex-col gap-9 relative">
-              {/* Vertical Dashed Line - Ends at the last agent circle */}
-              <div className="absolute left-[15px] top-4 bottom-4 border-l-[1.5px] border-dashed border-slate-300" />
+          <div className="flex-1 relative mt-4">
+            <div className="flex flex-col gap-8 relative">
+              {/* Connector Line */}
+              <div className="absolute left-[13px] top-4 bottom-4 border-l border-[#00FF41]/20" />
 
               {currentAgents.map((s: any, i: number) => (
                 <div key={s.id} className="flex items-center gap-4 relative">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold z-10 transition-all ${s.status === 'ACTIVE' ? 'text-white shadow-lg scale-110' : 'text-white'}`}
-                    style={{
-                      backgroundColor: s.color,
-                      boxShadow: s.status === 'ACTIVE' ? `0 4px 10px ${s.color}33` : 'none',
-                      opacity: s.status === 'COMPLETED' ? 0.6 : 1
-                    }}
-                  >
-                    {i + 1}
+                  <div className={`w-7 h-7 rounded border flex items-center justify-center text-[10px] font-bold z-10 transition-all 
+                      ${s.status === 'ACTIVE' ? 'bg-[#00FF41] text-black border-[#00FF41] shadow-[0_0_15px_#00FF41]' : 'bg-black text-[#00FF41]/60 border-[#00FF41]/30'}`}>
+                    0{i + 1}
                   </div>
-                  <div className="flex-1 flex items-center justify-between min-w-0">
-                    <div className="flex flex-col justify-center">
-                      <div className={`text-[12px] font-bold tracking-wider leading-none ${s.status === 'ACTIVE' ? 'text-red-500' : 'text-[#1a2b4b]'}`}>
-                        {s.label}
-                      </div>
-                      <div className="text-[11px] text-[#52525b] mt-1.5 leading-none">{s.status === 'ACTIVE' ? (s.desc || "Processing...") : s.status}</div>
+                  <div className="flex flex-col">
+                    <div className={`text-[10px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' ? 'text-[#00FF41] matrix-text-glow' : 'text-gray-500'}`}>
+                      {s.label}
                     </div>
-                    {s.time && (
-                      <div className="text-[10px] font-mono text-slate-400 font-bold ml-4">
-                        {s.time}
-                      </div>
-                    )}
+                    <div className={`text-[8px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' ? 'text-[#00FF41]/80' : 'text-gray-700'}`}>
+                      {s.status}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -454,46 +397,46 @@ export default function NoxDashboard() {
         </div>
       </div>
 
-      {/* MAIN ORBIT AREA (Centered in Viewport) */}
+      {/* CENTRAL AREA */}
       <div className="w-full h-full relative flex items-center justify-center">
-        <div ref={stageRef} className="relative w-[min(960px,96vmin)] h-[min(960px,96vmin)]">
+        <div ref={stageRef} className="relative w-[min(900px,90vmin)] h-[min(900px,90vmin)]">
 
           <NeuralCore
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            size={ringD * 0.61}
+            size={ringD * 0.7}
             mode={state === "speaking" ? "talking" : state === "processing" ? "thinking" : "idle"}
           />
 
           <div ref={orbitDashedRef} className="orbit-dashed" style={{ width: dashD, height: dashD }} />
-          <div ref={orbitDotsRef} className="absolute left-1/2 top-1/2 w-0 h-0 will-change-transform">
-            {[30, 60, 120, 150, 210, 240, 300, 330].map((deg) => (
+          <div ref={orbitDotsRef} className="absolute left-1/2 top-1/2 w-0 h-0">
+            {[0, 45, 90, 135, 180, 225, 270, 315].map(deg => (
               <span key={deg} className="orbit-dot" style={{ transform: `rotate(${deg}deg) translate(0, ${-dotR}px)` }} />
             ))}
           </div>
 
           {(() => {
-            const R = (innerR + outerR) / 2; const SW = stroke; const VB = ringD + SW * 4; const C = VB / 2;
+            const R = (innerR + outerR) / 2; const SW = stroke; const VB = ringD + SW * 6; const C = VB / 2;
             const polar = (deg: number) => { const r = (deg * Math.PI) / 180; return [C + R * Math.cos(r), C + R * Math.sin(r)]; };
             const arcPath = (a0: number, a1: number) => { const [x0, y0] = polar(a0); const [x1, y1] = polar(a1); return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${R} ${R} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`; };
             return (
-              <svg ref={ringGradRef} width={VB} height={VB} viewBox={`0 0 ${VB} ${VB}`} style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", overflow: "visible", willChange: "transform" }}>
+              <svg ref={ringGradRef} width={VB} height={VB} viewBox={`0 0 ${VB} ${VB}`} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible pointer-events-none">
                 <g>
-                  {AGENTS.map((a) => (
+                  {AGENTS.map(a => (
                     <g key={a.id + "-arc"}>
-                      <path d={arcPath(a.angle - 36, a.angle + 36)} stroke={a.color} strokeWidth={SW * 2.2} strokeLinecap="round" fill="none" opacity="0.28" style={{ filter: `blur(${(SW * 0.9).toFixed(1)}px)` }} />
-                      <path d={arcPath(a.angle - 36, a.angle + 36)} stroke={a.color} strokeWidth={SW} strokeLinecap="round" fill="none" />
+                      <path d={arcPath(a.angle - 30, a.angle + 30)} stroke="#00FF41" strokeWidth={SW * 3} strokeLinecap="round" fill="none" opacity="0.15" style={{ filter: 'blur(10px)' }} />
+                      <path d={arcPath(a.angle - 30, a.angle + 30)} stroke="#00FF41" strokeWidth={SW} strokeLinecap="round" fill="none" />
                     </g>
                   ))}
-                  {AGENTS.map((a) => { const [cx, cy] = polar(a.angle); return <circle key={a.id + "-knot"} cx={cx} cy={cy} r={SW * 0.95} fill="#fff" stroke={a.color} strokeWidth={SW * 0.55} />; })}
+                  {AGENTS.map(a => { const [cx, cy] = polar(a.angle); return <circle key={a.id + "-knot"} cx={cx} cy={cy} r={SW * 1.5} fill="#00FF41" className="animate-pulse" />; })}
                 </g>
               </svg>
             );
           })()}
 
           {currentAgents.map((a: any) => (
-            <div key={a.id + "-arrow"} ref={el => { if (el) arrowRefs.current[a.id] = { ...arrowRefs.current[a.id], wrap: el }; }} className="absolute left-1/2 top-1/2 w-0 h-0 will-change-transform">
-              <div ref={el => { if (el && arrowRefs.current[a.id]) arrowRefs.current[a.id].line = el; }} className="arrow-line" style={{ left: arrowInner, width: arrowLen, background: `linear-gradient(90deg, ${a.color}00, ${a.color}cc)` }} />
-              <div ref={el => { if (el && arrowRefs.current[a.id]) arrowRefs.current[a.id].head = el; }} className="arrow-head" style={{ left: arrowInner - 7, borderLeftColor: a.color }} />
+            <div key={a.id + "-arrow"} ref={el => { if (el) arrowRefs.current[a.id] = { ...arrowRefs.current[a.id], wrap: el }; }} className="absolute left-1/2 top-1/2 w-0 h-0">
+              <div className="arrow-line" style={{ left: arrowInner, width: arrowLen, background: 'linear-gradient(90deg, transparent, #00FF41)' }} />
+              <div className="arrow-head" style={{ left: arrowInner - 5, borderLeftColor: '#00FF41' }} />
             </div>
           ))}
 
@@ -501,55 +444,32 @@ export default function NoxDashboard() {
             const ensureRef = () => { if (!tileRefs.current[a.id]) tileRefs.current[a.id] = { wrap: null, card: null, halo: null }; };
             return (
               <div key={a.id} ref={el => { ensureRef(); tileRefs.current[a.id].wrap = el; }} className="tile-wrap">
-                <div ref={el => { ensureRef(); tileRefs.current[a.id].card = el; }} className="tile-card" style={{ gap: '6px' }}>
-                  <div ref={el => { ensureRef(); tileRefs.current[a.id].halo = el; }} className="tile-halo" style={{ background: `radial-gradient(closest-side, ${a.color}55, ${a.color}00 70%)` }} />
-                  <div className="relative z-10 bg-white rounded-[12px] p-[6px] shadow-[0_18px_38px_-18px_rgba(43,47,74,0.28),0_4px_10px_-4px_rgba(43,47,74,0.10)]">
-                    <div className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center text-white" style={{ background: `linear-gradient(180deg, ${a.gradFrom}, ${a.gradTo})`, boxShadow: `0 10px 24px -8px ${a.color}99, inset 0 1px 0 rgba(255,255,255,0.25)` }}>
-                      <Icon kind={a.icon} />
-                    </div>
+                <div ref={el => { ensureRef(); tileRefs.current[a.id].card = el; }} className="tile-card">
+                  <div ref={el => { ensureRef(); tileRefs.current[a.id].halo = el; }} className="tile-halo" style={{ background: 'radial-gradient(closest-side, rgba(0, 255, 65, 0.4), transparent)' }} />
+                  <div className="w-9 h-9 border border-[#00FF41]/40 bg-black/80 flex items-center justify-center text-[#00FF41] shadow-[0_0_15px_rgba(0,255,65,0.2)]">
+                    <Icon kind={a.icon} />
                   </div>
-                  <div className="text-[10px] tracking-[0.05em] font-semibold text-[#2B2F4A] whitespace-nowrap uppercase">{a.label}</div>
+                  <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-[#00FF41]/70">{a.label}</span>
                 </div>
               </div>
             );
           })}
         </div>
       </div>
-      {/* SYSTEM FLOOR (BOTTOM STATUS) */}
-      <div className="absolute bottom-6 left-[388px] right-[388px] h-[88px] bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] z-40 flex items-center px-12 justify-between border border-white/50">
 
-        {/* ACTIVE */}
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
-            {fullState ? (fullState.pipeline || []).filter((a:any) => a.status === 'in_progress').length : "--"}
+      {/* FOOTER STATUS */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 h-16 w-fit min-w-[600px] border border-[#00FF41]/30 bg-black/60 backdrop-blur-md rounded px-10 flex items-center justify-between gap-12 z-50">
+        {[
+          { label: 'ACTIVE', val: fullState ? (fullState.pipeline || []).filter((a: any) => a.status === 'in_progress').length : "--" },
+          { label: 'COMPLETED', val: fullState ? (fullState.tasks?.completed || 0) : "--" },
+          { label: 'QUEUED', val: fullState ? (fullState.tasks?.queued || 0) : "--" },
+          { label: 'TOTAL', val: fullState ? (fullState.tasks?.completed || 0) + (fullState.tasks?.queued || 0) : "--" }
+        ].map(stat => (
+          <div key={stat.label} className="flex items-center gap-4">
+            <span className="text-xl font-bold tracking-tighter matrix-text-glow">{stat.val}</span>
+            <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.3em]">{stat.label}</span>
           </div>
-          <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">ACTIVE</div>
-        </div>
-
-        {/* COMPLETED */}
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
-            {fullState ? (fullState.tasks?.completed || 0) : "--"}
-          </div>
-          <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">COMPLETED</div>
-        </div>
-
-        {/* QUEUED */}
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
-            {fullState ? (fullState.tasks?.queued || 0) : "--"}
-          </div>
-          <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">QUEUED</div>
-        </div>
-
-        {/* TOTAL */}
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#3D7BFF] font-bold text-lg">
-            {fullState ? (fullState.tasks?.completed || 0) + (fullState.tasks?.queued || 0) : "--"}
-          </div>
-          <div className="text-[12px] font-bold text-[#1a2b4b] uppercase tracking-wider">TOTAL</div>
-        </div>
-
+        ))}
       </div>
     </main>
   );

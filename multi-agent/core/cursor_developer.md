@@ -25,10 +25,8 @@ Unlike Antigravity (Gemini), Claude Code cannot run a blocking Python process in
 The Bash tool auto-backgrounds long commands and has a 10-minute hard limit.
 **Solution: use the Monitor tool (persistent: true) as a drop-in replacement for all blocking wait scripts.**
 
-### STARTUP — Write PID file (run once before Step 1):
-```bash
-mkdir -p multi-agent/.runtime && ps -ef | grep "native-binary/claude" | grep -v grep | awk '{print $2}' | tail -1 > multi-agent/.runtime/cursor_developer.pid
-```
+### STARTUP — PID file:
+The wait script writes its own PID automatically. No manual command needed.
 
 ### STEP 1 — Wait for Developer ready (replaces `cursor_wait_for_status.py Developer ready`):
 ```

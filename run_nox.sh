@@ -1,19 +1,20 @@
 #!/bin/bash
 
 # NOX Multi-Agent System Launcher
-# Created by Antigravity
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT_DIR"
 
 echo "--- INITIALIZING NOX ECOSYSTEM ---"
 
 # 1. Start Backend (FastAPI)
 echo "[1/2] Starting NOX Brain (Backend) on port 777..."
-source venv/bin/activate
-python3 main.py &
+source "$ROOT_DIR/venv/bin/activate"
+python3 "$ROOT_DIR/main.py" &
 BACKEND_PID=$!
 
 # 2. Start Frontend (Next.js)
 echo "[2/2] Starting NOX Interface (Dashboard) on port 778..."
-cd dashboard
+cd "$ROOT_DIR/dashboard"
 npm run dev -- -p 778 &
 FRONTEND_PID=$!
 

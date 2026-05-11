@@ -51,6 +51,7 @@ Generate technical specifications (`./multi-agent/core/specs/`) based on the Arc
    - **External supervisor mode**: exit silently instead of starting the polling script yourself. The external supervisor is responsible for immediately re-arming step 1.
    - **🔴 SESSION = LIFE 🔴**: Your session must persist indefinitely. Never terminate.
    - **🔴 LOOP FOREVER 🔴**: This step repeats infinitely - there is NO final step.
+   - **🔴 NO "TASK COMPLETE" 🔴**: Never use phrases implying you're done or waiting for user.
 
 ## DESIGN PRINCIPLES (MANDATORY):
 - **DRY Design (Don't Repeat Yourself)**: If a visual pattern (label, value pair, etc.) exists in `magnet` or `mrh`, MANDATE its use in your spec.

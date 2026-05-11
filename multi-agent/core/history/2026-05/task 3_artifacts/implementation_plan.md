@@ -1,18 +1,23 @@
-# Implementation Plan: Create Green Cube Button Widget with Counter
+# Implementation Plan: Green Cube Button Widget with Counter
 
 ## Task
-Create a Flutter StatefulWidget named `GreenCubeButton`.
+Create a Flutter `GreenCubeButton` StatefulWidget in `test/green_cube_button.dart`.
 
-## Target File
+## Reference
+- `test/blue_cube_button.dart` — centered child pattern
+- `test/red_cube_button.dart` — GestureDetector + Container base
+
+## File to Create
 `test/green_cube_button.dart`
 
 ## Requirements
-- Widget class: `GreenCubeButton` extends `StatefulWidget` with `_GreenCubeButtonState`
-- An 80x80 square using `BoxDecoration` with `color: Colors.green`
-- Internal `int _count = 0` state variable
-- Each tap calls `setState` to increment `_count`
-- Centered white `Text` displaying current `_count`
-- No external dependencies (only `package:flutter/material.dart`)
+- Widget class: `GreenCubeButton` (StatefulWidget)
+- Dimensions: 80×80
+- Appearance: solid green square (`Colors.green`)
+- Internal counter starting at 0
+- Tap increments counter via `setState`
+- Counter displayed as centered white text inside cube
+- No external package dependencies (Flutter SDK only)
 
 ## Implementation
 
@@ -39,10 +44,15 @@ class _GreenCubeButtonState extends State<GreenCubeButton> {
         decoration: const BoxDecoration(
           color: Colors.green,
         ),
-        alignment: Alignment.center,
-        child: Text(
-          '$_count',
-          style: const TextStyle(color: Colors.white),
+        child: Center(
+          child: Text(
+            '$_count',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );
@@ -51,6 +61,6 @@ class _GreenCubeButtonState extends State<GreenCubeButton> {
 ```
 
 ## Notes
-- StatefulWidget required for counter state
-- Counter starts at 0, increments on each tap
-- `test/` directory already exists
+- `StatefulWidget` + `_GreenCubeButtonState` — different from tasks 1 & 2 (StatelessWidget).
+- `setState(() => _count++)` triggers rebuild with updated counter.
+- No `print()` call — counter display is the tap feedback.

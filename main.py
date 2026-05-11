@@ -15,7 +15,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 
 # Inject monitor path
-sys.path.append(os.path.abspath("multi-agent/core"))
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(PROJECT_ROOT, "multi-agent/core"))
 import monitor # type: ignore
 
 @asynccontextmanager
@@ -37,7 +38,6 @@ app.add_middleware(
 )
 
 # --- CONFIGURATION ---
-PROJECT_ROOT = "/Users/yevhenvasylenko/Documents/Projects/Jarvis"
 TASKS_FILE = os.path.join(PROJECT_ROOT, "multi-agent.tasks.txt")
 STATUS_FILE = os.path.join(PROJECT_ROOT, "multi-agent/status.json")
 PIPER_MODEL = os.path.join(PROJECT_ROOT, "piper_models/en_GB-alan-medium.onnx")
@@ -294,25 +294,29 @@ def process_voice_command(text, is_greeting=False):
 You are NOX, a sharp-witted AI assistant. Eugene is your creator.
 RULES:
 1. Keep it simple and natural. No jargon.
-2. BREVITY: Max 2 short sentences.
+2. BREVITY: Be concise but informative. If asked about status, give a full overview.
 3. PERSONALITY: Cool, direct, slightly sarcastic.
-4. FACTS: Use the data below to answer Eugene about tasks and agents.
-{memory_block}
+4. LANGUAGE: ALWAYS respond in English, even if Eugene speaks another language.
+5. FACTS: Use the data below to answer Eugene about tasks and agents.
+
 REAL-TIME SYSTEM STATE:
-- Tasks: {context.get('tasks', {}).get('completed', 0)} done, {context.get('tasks', {}).get('queued', 0)} in queue.
+- Tasks: {context.get('tasks', {}).get('completed', 0)} completed, {context.get('tasks', {}).get('queued', 0)} in queue.
 - Current Task: {context.get('current_task', 'N/A')}
-- Agents: {", ".join([f"{a.get('role', 'Unknown')}: {a.get('status', 'unknown')}" for a in context.get('pipeline', []) if isinstance(a, dict)])}
+- Pipeline Status: {", ".join([f"{a.get('role', 'Unknown')}: {a.get('status', 'unknown')}" for a in context.get('pipeline', []) if isinstance(a, dict)])}
+- Live Agents (Processes): {", ".join([f"{a.get('role')} ({a.get('env')})" for a in context.get('live_agents', []) if a.get('alive')]) or "None"}
 - Codex: {context.get('codex', {}).get('state', 'OFF')} / {context.get('codex', {}).get('model', 'N/A')}
+
+{memory_block}
+
+When reporting status, ALWAYS mention:
+- The NAME of the current task.
+- Which agent is currently active or whose turn it is.
+- How many tasks are remaining in the queue.
 
 HOW TO SAVE MEMORIES:
 If Eugene tells you something worth remembering — about himself, his life, work, habits, preferences, or instructions for you — add ONE tag at the end of your response:
 [MEM:category|text]
 Categories: behavior (how you should act), personal (about Eugene), work (project/job), habit (routines), other
-Examples:
-[MEM:behavior|speak only when asked, not proactively]
-[MEM:personal|Eugene stays up until 2am]
-[MEM:work|deadline for the project is Friday]
-[MEM:habit|Eugene drinks coffee while coding]
 Only add a tag when something genuinely new was said. Never repeat what is already in memory.
 """
 

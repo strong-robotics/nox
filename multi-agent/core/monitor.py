@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Setup paths relative to this script's location
@@ -19,6 +20,8 @@ RUNTIME_DIR = PROJECT_ROOT / "multi-agent/.runtime"
 CODEX_LOG_FILE = RUNTIME_DIR / "codex_developer_supervisor.log"
 CODEX_PID_FILE = RUNTIME_DIR / "codex_developer_supervisor.pid"
 CURSOR_LOG_FILE = RUNTIME_DIR / "cursor_architect.log"
+DEVELOPER_LOG_FILE = RUNTIME_DIR / "developer.log"
+TESTER_LOG_FILE = RUNTIME_DIR / "tester.log"
 
 EVENT_LABELS = {
     "TASK_FOUND": "Task found in queue",
@@ -128,6 +131,7 @@ def wait_detail(cmd):
 
 CODEX_ROLES = ["architect", "developer", "designer", "tester"]
 HEARTBEAT_TIMEOUT = 15  # seconds without tick update = agent considered dead
+CODEX_APP_HEARTBEAT_TIMEOUT = 5 * 60  # Codex.app heartbeat is expected every ~2 minutes
 
 def heartbeat_alive(role: str):
     """Returns True/False if heartbeat file exists, None if no heartbeat (ignore)."""
@@ -138,6 +142,15 @@ def heartbeat_alive(role: str):
         data = json.loads(hb_file.read_text())
         age = time.time() - data.get("ts", 0)
         return age < HEARTBEAT_TIMEOUT
+    except Exception:
+        return None
+
+def iso_age_seconds(value):
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        return (datetime.now(timezone.utc) - parsed).total_seconds()
     except Exception:
         return None
 
@@ -214,6 +227,67 @@ def get_all_codex_states():
         if pid_path.exists() or log_path.exists():
             result.append(get_codex_role_state(role))
     return result
+
+def get_codex_app_states():
+    """Returns state files for Codex.app chat-mode agents."""
+    result = []
+    current_role_config = read_json(RUNTIME_DIR / "codex_app_current_role.json", {})
+    selected_role = str(current_role_config.get("role_lower") or current_role_config.get("role") or "").lower()
+    for role in CODEX_ROLES:
+        state_path = RUNTIME_DIR / f"codex_app_{role}.state.json"
+        pid_path = RUNTIME_DIR / f"codex_app_{role}.pid"
+        if not state_path.exists() and not pid_path.exists():
+            continue
+
+        state = read_json(state_path, {})
+        pid = state.get("wait_pid")
+        try:
+            if pid_path.exists():
+                pid = int(pid_path.read_text().strip())
+        except Exception:
+            pass
+
+        heartbeat_at = state.get("last_heartbeat_at") or state.get("last_updated")
+        heartbeat_age = iso_age_seconds(heartbeat_at)
+        heartbeat_alive = heartbeat_age is not None and heartbeat_age < CODEX_APP_HEARTBEAT_TIMEOUT
+        signal_received = bool(state.get("signal_received", False))
+        executing = state.get("state") == "executing"
+        process_alive = pid_alive(pid)
+        is_selected = role == selected_role
+
+        result.append({
+            "role": state.get("role", role.title()),
+            "env": "codex_app",
+            "selected": is_selected,
+            "state": state.get("state", "unknown"),
+            "signal_received": signal_received,
+            "pid": pid,
+            "process_alive": process_alive,
+            "heartbeat_alive": heartbeat_alive,
+            "alive": process_alive or (is_selected and (heartbeat_alive or signal_received or executing)),
+            "virtual": not process_alive,
+            "heartbeat_age_seconds": heartbeat_age,
+            "target_status": state.get("target_status", "ready"),
+            "current_status": state.get("current_status"),
+            "run_id": state.get("run_id"),
+            "last_updated": state.get("last_updated"),
+            "last_heartbeat_at": state.get("last_heartbeat_at"),
+            "strategy": state.get("strategy"),
+            "claimed_at": state.get("claimed_at"),
+            "state_file": state_path.name,
+            "pid_file": pid_path.name,
+        })
+    return result
+
+def get_recent_role_events(log_file, limit=8):
+    lines = read_lines(log_file, 200)
+    events = []
+    for line in reversed(lines):
+        clean = line.strip()
+        if clean and clean not in events:
+            events.append(clean)
+            if len(events) >= limit: break
+    return list(reversed(events))
 
 def get_recent_cursor_events(limit=8):
     events, seen = [], set()
@@ -310,10 +384,12 @@ def get_live_agents():
                 pid = ls_pid
         if pid is None:
             continue
-        # Heartbeat override: if file exists and is stale → agent is dead
-        hb = heartbeat_alive(role)
-        if hb is not None:
-            alive = hb
+        # Antigravity uses role-only heartbeat files. Do not apply those files
+        # to Cursor/Codex/Codex.app agents with the same role.
+        if env == "antigravity":
+            hb = heartbeat_alive(role)
+            if hb is not None:
+                alive = hb
         key = (env, role)
         if key in seen_roles_envs:
             continue
@@ -325,6 +401,26 @@ def get_live_agents():
             "kill_pid": kill_pid,
             "alive": alive,
             "pid_file": filename,
+        })
+    # Codex.app heartbeat-direct agents have no stable OS process. Surface them
+    # as virtual live agents when their heartbeat state is fresh or signaled.
+    for state in get_codex_app_states():
+        role = state.get("role", "")
+        key = ("codex_app", role)
+        if not role or key in seen_roles_envs:
+            continue
+        if not state.get("alive"):
+            continue
+        seen_roles_envs.add(key)
+        agents.append({
+            "role": role,
+            "env": "codex_app",
+            "pid": None,
+            "kill_pid": None,
+            "alive": True,
+            "virtual": True,
+            "state": state.get("state"),
+            "pid_file": state.get("state_file"),
         })
     return agents
 
@@ -364,7 +460,10 @@ def get_full_system_state():
         "pipeline": status.get("pipeline", []),
         "live_agents": get_live_agents(),
         "codex_agents": get_all_codex_states(),
+        "codex_app_agents": get_codex_app_states(),
         "codex": get_codex_state(),
         "cursor_events": get_recent_cursor_events(),
+        "developer_events": get_recent_role_events(DEVELOPER_LOG_FILE),
+        "tester_events": get_recent_role_events(TESTER_LOG_FILE),
         "last_updated": status.get("last_updated", "N/A")
     }

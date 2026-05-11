@@ -27,6 +27,7 @@ If the Developer or Tester was skipped, Tester never activates.
 - Set `"started_at": "<CURRENT_ISO_TIME>"` for Tester role.
 - Increment `"qa_attempts"` by 1 for Tester role (start at 0 if field missing).
 - **Antigravity**: use `write_to_file`. **Cursor (Claude Code)**: use the `Write` tool. **Codex**: use regular local filesystem edits.
+- **Log**: `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] TESTER_START task=$(grep -m1 'Task ID:' multi-agent/core/artifacts/task.md | awk '{print $NF}') attempt=$(python3 -c \"import json; d=json.load(open('multi-agent/status.json')); print(next(r.get('qa_attempts',1) for r in d['pipeline'] if r['role']=='Tester'))\")" >> multi-agent/.runtime/tester.log`
 
 ### Step 3.5: **Check Retry Limit**
 🔴 **SILENCE** 🔴
@@ -49,19 +50,23 @@ If the Developer or Tester was skipped, Tester never activates.
 ### Step 5: **Run Verification**
 🔴 **SILENCE** 🔴
 - Run `git diff HEAD~1 --name-only` (or `git status`) to see which files changed.
+- **Log changed files**: `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] CHECKING_FILES $(git diff HEAD~1 --name-only | tr '\n' ' ')" >> multi-agent/.runtime/tester.log`
+- **Read `[CHECK] Acceptance Criteria`** section from `implementation_plan.md` — this is your primary checklist. Go through every item.
 - Run the appropriate verification command based on the `Stack:` field in `task.md`:
   - **TypeScript / Next.js**: `npx tsc --noEmit`
   - **Flutter / Dart**: `flutter analyze`
   - **Node.js**: `node --check <entry>` or project-specific lint
   - **Other / not specified**: check for obvious syntax errors, run any available `lint` or `test` script in `package.json`
-- Verify that modified files match what `implementation_plan.md` planned.
-- Check for leftover `console.log`, debug code, hardcoded strings, or TODO items in changed files.
+- Verify that **Owns** files in `implementation_plan.md` were actually created/modified.
+- Check each `[CHECK]` criterion — read the actual file content to confirm each one passes.
 
 ### Step 6: **Decision**
 
 ---
 
 #### ✅ IF ALL CHECKS PASS:
+
+- **Log**: `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] QA_PASS" >> multi-agent/.runtime/tester.log`
 
 1. **Update `status.json`** first so `archive_task.py` captures final Tester timestamps:
    - Set `"status": "completed"` for Tester role.
@@ -81,10 +86,12 @@ If the Developer or Tester was skipped, Tester never activates.
 
 #### ❌ IF ANY CHECK FAILS:
 
+- **Log**: `echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] QA_FAIL" >> multi-agent/.runtime/tester.log`
+
 1. **Create feedback artifact**: Write `./multi-agent/core/artifacts/qa_feedback.md` with:
    - Header: `# QA Feedback — Attempt {qa_attempts} of {max_retries}`
-   - A numbered list of what failed — specific, actionable, no vague "improve this".
-   - What was expected vs. what was found for each item.
+   - For each failed `[CHECK]` criterion: quote the criterion, state what was found instead.
+   - Format: `- [ ] <criterion from plan> → FAILED: <what was actually found>`
    - All content in **English**.
 2. **Update `status.json`**:
    - Set `"status": "waiting"` for Tester role (will wait for Developer to re-trigger).

@@ -10,6 +10,7 @@
   - The script BLOCKS execution while waiting for tasks (keeping session alive). **Antigravity only**: use `command_status` to wait for the polling script. **Cursor (Claude Code)**: use `Monitor(persistent=true)` instead — see your env-specific config file.
   - When the script exits (task found), process the task immediately, then restart the script again. 
   - This creates an eternal loop: wait → task found → process → reset → wait again.
+  - **Exit code 2 = timeout restart**: if the polling script exits with code 2, it is a 15-minute self-restart cycle. Immediately run the same script again. This is NOT a task signal.
   - **External wait handoff**: if the supervisor already executed the environment-specific `wait_for_*` script and woke you only after it returned successfully, DO NOT rerun the same long polling script. Treat the wake condition as already satisfied, verify fresh state from disk, do the role work, then exit silently so the supervisor can re-arm the wait.
 - **🔴 IGNORE YOUR HISTORY 🔴**: Do not assume you know the status. Your chat history is STALE and will mislead you.
 - **🔴 TRUST ONLY THE SCRIPT 🔴**: Your first action MUST be running the environment-specific polling script.

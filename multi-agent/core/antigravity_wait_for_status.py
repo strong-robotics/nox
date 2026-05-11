@@ -61,6 +61,8 @@ def wait_for_status(role, target_status):
     print(f"Current Directory (CWD): {os.getcwd()}")
     print(f"Waiting for status '{target_status}'...")
 
+    MAX_WAIT_SECONDS = 15 * 60  # 15 min then exit(2) — live agent restarts, dead agent won't
+    start_time = time.time()
     last_reported_status = None
     check_counter = 0
     initial_ppid = os.getppid()
@@ -68,6 +70,10 @@ def wait_for_status(role, target_status):
     log(role, f"START ppid={initial_ppid} pid={os.getpid()}")
 
     while True:
+        if time.time() - start_time > MAX_WAIT_SECONDS:
+            log(role, "TIMEOUT exit(2) — restart if alive")
+            sys.exit(2)
+
         # Check 1: reparented to launchd
         if os.getppid() == 1:
             log(role, "EXIT: ppid=1 (orphaned)")

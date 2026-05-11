@@ -1,10 +1,10 @@
-# Task Metadata
+# Task Metadata: task 1
 
 ## Task ID
 task 1
 
 ## Action
-Create a red cube button widget
+Create a red cube button widget (Flutter)
 
 ## Stack
 Flutter
@@ -17,5 +17,11 @@ Flutter
 ## Max QA Retries
 N/A (Tester skipped)
 
+## Pipeline
+Architect → Developer (Designer and Tester skipped)
+
 ## Summary
-Create `test/red_cube_button.dart` with a StatelessWidget `RedCubeButton`. 80x80 red square using BoxDecoration with color Colors.red. Tapping prints "Red pressed" to console. No external dependencies. Developer is the last agent and handles archive/pop/cleanup.
+Create `test/red_cube_button.dart` with `RedCubeButton` StatelessWidget. 80×80 red square, prints "Red pressed" on tap. No external dependencies.
+
+## Key Files
+- **Create**: `test/red_cube_button.dart`

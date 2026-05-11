@@ -11,10 +11,10 @@
 - Scripts: `cursor_wait_for_...`
 - Paths: Relative to project root (`./multi-agent/core/...`)
 
-## TEAM CONFIGURATION (edit to match your actual setup):
-- Designer Chat Name: "Antigravity Designer"
-- Developer Chat Name: "Codex Developer"
-- Tester Chat Name: "Antigravity Tester"
+## TEAM CONFIGURATION:
+- Designer Chat Name: "Designer"
+- Developer Chat Name: "Developer"
+- Tester Chat Name: "Tester"
 
 ## SCRIPTS:
 - Polling Task: `python3 multi-agent/core/cursor_wait_for_task.py`
@@ -48,10 +48,12 @@ Log file: `multi-agent/.runtime/cursor_architect.log`
 
 ---
 
-### STARTUP — Write PID file (run once before Step 1):
+### STARTUP — PID file:
+As your very first bash command (before anything else), run:
 ```bash
-mkdir -p multi-agent/.runtime && ps -ef | grep "native-binary/claude" | grep -v grep | awk '{print $2}' | tail -1 > multi-agent/.runtime/cursor_architect.pid
+echo $PPID > multi-agent/.runtime/cursor_architect.pid
 ```
+`$PPID` is the parent Claude process — it stays alive for the entire session, so the pid file remains valid through all WAITING and ACTIVE phases. Do not delete it during the session; it cleans up naturally when the process exits.
 
 ### STEP 1 — Poll task queue (replaces `cursor_wait_for_task.py`):
 ```

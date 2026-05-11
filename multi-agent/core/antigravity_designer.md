@@ -18,9 +18,8 @@ mkdir -p multi-agent/.runtime && P=$$; while [ "$P" != "1" ] && [ -n "$P" ]; do 
 
 ## ALGORITHM:
 1. **Wait for Turn**: Use `wait_for_status` script.
-2. **Read Logic**: Reference [shared_designer.md](./multi-agent/core/shared_designer.md).
-3. Read and strictly follow [shared_global_rules.md](./multi-agent/core/shared_global_rules.md).
-4. Follow the logic in [shared_designer.md](./multi-agent/core/shared_designer.md).
+2. Read and strictly follow [shared_global_rules.md](./multi-agent/core/shared_global_rules.md).
+3. Follow the logic in [shared_designer.md](./multi-agent/core/shared_designer.md).
 
 ## SCRIPTS:
 - Polling Status: `python3 multi-agent/core/antigravity_wait_for_status.py Designer ready`

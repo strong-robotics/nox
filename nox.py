@@ -10,7 +10,7 @@ import wave
 import tempfile
 
 # --- CONFIGURATION ---
-PROJECT_ROOT = "/Users/yevhenvasylenko/Documents/Projects/Jarvis"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 TASKS_FILE = os.path.join(PROJECT_ROOT, "multi-agent.tasks.txt")
 STATUS_FILE = os.path.join(PROJECT_ROOT, "multi-agent/status.json")
 LOG_DIR = os.path.join(PROJECT_ROOT, "multi-agent/.runtime")
