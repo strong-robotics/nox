@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import NeuralCore from "@/components/NeuralCore";
+import MatrixRain from "@/components/MatrixRain";
 
 const fmtTime = (iso: string) => {
   if (!iso) return "";
@@ -309,6 +310,7 @@ export default function NoxDashboard() {
 
   return (
     <main className="relative w-full h-screen bg-black text-[#00FF41] font-mono overflow-hidden">
+      <MatrixRain />
       <style dangerouslySetInnerHTML={{
         __html: `
         .orbit-dashed { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1px dashed rgba(0, 255, 65, 0.2); will-change: transform; }
