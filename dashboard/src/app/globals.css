@@ -171,7 +171,7 @@ body::before {
   content: '';
   position: absolute;
   inset: var(--border-width);
-  background: var(--notched-bg, rgba(0, 15, 11, 0.95));
+  background: var(--notched-bg, rgba(0, 0, 0, 0.88));
   clip-path: inherit;
   z-index: 0;
 }
@@ -211,4 +211,16 @@ body::before {
 /* Utility to hide corner accents where not needed */
 .no-corners::after {
   display: none !important;
+}
+
+.matrix-text-glow {
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.6), 0 0 15px rgba(0, 255, 65, 0.3);
+}
+
+.matrix-text-glow-white {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.matrix-text-glow-teal {
+  text-shadow: 0 0 8px rgba(0, 255, 189, 0.5), 0 0 15px rgba(0, 255, 189, 0.2);
 }

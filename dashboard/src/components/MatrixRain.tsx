@@ -29,15 +29,14 @@ const MatrixRain = () => {
     const draw = () => {
       // Сбрасываем тень перед заливкой фона, чтобы она не влияла на прозрачный прямоугольник
       ctx.shadowBlur = 0;
-      ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; // Ускорил очистку, чтобы убрать "призрачные" полоски
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)"; // Ускорил очистку для более коротких и четких шлейфов
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.font = `${fontSize}px monospace`;
 
       for (let i = 0; i < drops.length; i++) {
         // 1. Перекрашиваем предыдущий символ (который был белым) в зеленый.
-        // Используем ТОТ ЖЕ САМЫЙ символ, чтобы не было "каши" из наложенных друг на друга букв.
-        ctx.fillStyle = "#00553B"; // Темно-бирюзовый для хвоста
+        ctx.fillStyle = "#008F68"; // Чуть более выразительный бирюзовый для шлейфа
         ctx.shadowBlur = 0;
         ctx.fillText(headChars[i], i * fontSize * 2, (drops[i] - 1) * fontSize);
 
@@ -45,16 +44,15 @@ const MatrixRain = () => {
         const headText = characters.charAt(Math.floor(Math.random() * characters.length));
         headChars[i] = headText;
 
-        // 3. Рисуем текущий символ (голову капли) белым с зеленым свечением
+        // 3. Рисуем текущий символ (голову капли) белым с минимальным свечением
         ctx.fillStyle = "#FFFFFF";
-        ctx.shadowBlur = 4; // Уменьшил радиус, чтобы не копилась "муть" в колонках
+        ctx.shadowBlur = 1; // Минимальный радиус для максимальной четкости
         ctx.shadowColor = "#00FFBD";
         ctx.fillText(headText, i * fontSize * 2, drops[i] * fontSize);
 
         // Сбрасываем каплю в начало при достижении низа
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          // Превращаем последнюю белую голову в зеленую перед сбросом капли
-          ctx.fillStyle = "#00553B"; // Темно-бирюзовый для конца хвоста
+          ctx.fillStyle = "#008F68";
           ctx.shadowBlur = 0;
           ctx.fillText(headChars[i], i * fontSize * 2, drops[i] * fontSize);
           drops[i] = 0;

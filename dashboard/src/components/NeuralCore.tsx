@@ -190,6 +190,26 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
 
       // Layer 2: Concentric Razor Rings
       [0.985, 0.992, 1.0].forEach((rMult, idx) => {
+        // 0. Эффект "дыхания" центрального ядра (статичное облако с пульсацией яркости)
+        const time = Date.now() * 0.001;
+        ctx.save();
+        ctx.translate(canvas.width / 2 / dpr, canvas.height / 2 / dpr);
+        
+        const breathe = (Math.sin(time * 0.8) + 1) / 2; // Значение от 0 до 1
+        const opacity = 0.08 + (breathe * 0.10); // Плавно меняем яркость от 0.08 до 0.18
+        const radius = size * 0.45;
+        
+        const fog = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+        fog.addColorStop(0, `rgba(0, 255, 189, ${opacity})`);
+        fog.addColorStop(0.5, `rgba(0, 255, 189, ${opacity * 0.5})`);
+        fog.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        
+        ctx.fillStyle = fog;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
         ctx.beginPath();
         ctx.strokeStyle = idx === 1 ? "rgba(0, 255, 65, 0.4)" : "rgba(0, 255, 65, 0.1)";
         ctx.lineWidth = idx === 1 ? 0.7 : 0.4;

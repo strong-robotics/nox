@@ -68,46 +68,46 @@ function AgentStatusCard({ agent }: { agent: any }) {
   const glowClass = isActive ? "matrix-glow" : "";
 
   return (
-    <div className={`matrix-notched-new relative flex-1 h-[105px] min-h-[105px] p-5 flex items-center gap-4 overflow-hidden group ${isActive ? 'shadow-[0_0_20px_rgba(0,255,65,0.15)]' : ''}`}>
-      {/* Scanline overlay for the card */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00FFBD]/5 to-transparent bg-[length:100%_4px] pointer-events-none opacity-20" />
-
-      {/* Inner Icon Box - Rounded per example */}
-      <div className={`w-10 h-10 rounded-md border border-[#00FFBD]/40 flex items-center justify-center text-[#00FFBD] flex-shrink-0 bg-black/40 ${isActive ? 'shadow-[0_0_12px_rgba(0,255,65,0.25)]' : ''}`}>
-        <Icon kind={agent.icon} />
-      </div>
-
-      <div className="flex flex-col gap-0.5 flex-1 min-w-0 z-10">
-        <div className="flex justify-between items-start">
-          <div className={`text-[13px] font-bold ${isLive ? 'text-white' : 'text-[#00FFBD]'} leading-tight tracking-wide uppercase`}>{agent.label}</div>
-          {isLive && (agent.agentId || agent.pid) && (
-            <div className="text-[11px] font-mono text-[#00FFBD]/40">#{agent.agentId ?? agent.pid}</div>
-          )}
+    <div className={`matrix-notched-new relative flex-1 h-[105px] min-h-[105px] overflow-hidden group bg-black/90 ${isActive ? 'shadow-[0_0_20px_rgba(0,255,65,0.15)]' : ''}`}>
+      <div className="flex items-center gap-5 w-full h-full pl-4 z-10 relative">
+        {/* Inner Icon Box - Rounded per example */}
+        <div className={`w-10 h-10 rounded-md border border-[#00FFBD]/40 flex items-center justify-center text-[#00FFBD] flex-shrink-0 bg-black/40 ${isActive ? 'shadow-[0_0_12px_rgba(0,255,65,0.25)]' : ''}`}>
+          <Icon kind={agent.icon} />
         </div>
-        <div className="text-[13px] text-[#00FFBD]/40 truncate">{agent.model || "—"}</div>
-        <div className="text-[12px] text-[#00FFBD]/50 tracking-wider">[{agent.env || ""}]</div>
-        <div className="flex items-center gap-2 mt-1">
-          <div className={`w-1.5 h-1.5 rounded-full ${isActive || isWaiting ? 'bg-[#00FF41] animate-pulse shadow-[0_0_8px_#00FF41]' : 'bg-[#00FFBD]/10'}`} />
-          <div className={`text-[12px] font-bold tracking-widest uppercase ${statusColor}`}>{stopping ? "STOPPING" : agent.status}</div>
-        </div>
-      </div>
 
-      {isLive && (agent.pid || agent.agentId) && (
-        <button
-          onClick={async () => {
-            setStopping(true);
-            await fetch("http://localhost:777/kill-agent", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ pid: agent.agentId ?? agent.pid, role: agent.id }),
-            }).catch(() => { });
-            setStopping(false);
-          }}
-          className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center border border-red-900/50 hover:bg-red-950/30 text-red-500"
-        >
-          <span className="text-[10px]">×</span>
-        </button>
-      )}
+        <div className="flex flex-col gap-0.5 flex-1 min-w-0 z-10">
+          <div className="flex justify-between items-start">
+            <div className={`text-[13px] font-bold ${isLive ? 'text-white matrix-text-glow-white' : 'text-[#00FFBD] matrix-text-glow-teal'} leading-tight tracking-wide uppercase`}>{agent.label}</div>
+            {isLive && (agent.agentId || agent.pid) && (
+              <div className="text-[11px] font-mono text-[#00FFBD]/40">#{agent.agentId ?? agent.pid}</div>
+            )}
+          </div>
+          <div className="text-[13px] text-[#00FFBD]/40 truncate">{agent.model || "—"}</div>
+          <div className="text-[12px] text-[#00FFBD]/50 tracking-wider">[{agent.env || ""}]</div>
+          <div className="flex items-center gap-2 mt-1">
+            <div className={`w-1.5 h-1.5 rounded-full ${isActive || isWaiting ? 'bg-[#00FF41] animate-pulse shadow-[0_0_8px_#00FF41]' : 'bg-[#00FFBD]/10'}`} />
+            <div className={`text-[12px] font-bold tracking-widest uppercase ${statusColor} ${isActive || isWaiting ? 'matrix-text-glow' : ''}`}>{stopping ? "STOPPING" : agent.status}</div>
+          </div>
+        </div>
+
+        {/* Временно скрыто по запросу пользователя */}
+        {/* {isLive && (agent.pid || agent.agentId) && (
+          <button
+            onClick={async () => {
+              setStopping(true);
+              await fetch("http://localhost:777/kill-agent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pid: agent.agentId ?? agent.pid, role: agent.id }),
+              }).catch(() => { });
+              setStopping(false);
+            }}
+            className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center border border-red-900/50 hover:bg-red-950/30 text-red-500 mr-4"
+          >
+            <span className="text-[10px]">×</span>
+          </button>
+        )} */}
+      </div>
     </div>
   );
 }
@@ -337,7 +337,7 @@ export default function NoxDashboard() {
       {/* LEFT SIDEBAR - TASK QUEUE */}
       <div className="absolute left-6 top-[140px] bottom-10 w-[320px] flex flex-col z-40">
         <div className="mb-2 px-2 text-[10px] font-bold text-[#00FFBD] uppercase tracking-[0.3em] matrix-text-glow">SYSTEM.QUEUE //</div>
-        <div className="matrix-notched-new flex-1 overflow-hidden bg-black/60 backdrop-blur-md flex flex-col">
+        <div className="matrix-notched-new flex-1 overflow-hidden bg-black/90 flex flex-col">
           <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] z-10 p-5">
             {currentTasks.map((t: any, i: number) => (
               <div key={t.id} className={`p-4 flex flex-col gap-1 border-b border-[#00FFBD]/10`}>
@@ -358,7 +358,7 @@ export default function NoxDashboard() {
       {/* RIGHT SIDEBAR - CURRENT TASK & PROGRESS */}
       <div className="absolute right-6 top-[140px] bottom-10 w-[320px] flex flex-col z-40">
         <div className="mb-2 px-2 text-[10px] font-bold text-[#00FFBD] uppercase tracking-[0.3em] matrix-text-glow">CURRENT.PROCESS //</div>
-        <div className="matrix-notched-new flex-1 overflow-hidden bg-black/80 flex flex-col">
+        <div className="matrix-notched-new flex-1 overflow-hidden bg-black/90 flex flex-col">
           <div className="p-5 flex flex-col gap-6 z-10 flex-1">
             {(() => {
               const queued = fullState?.tasks?.all_queued || [];
@@ -385,17 +385,17 @@ export default function NoxDashboard() {
                 {currentAgents.map((s: any, i: number) => (
                   <div key={s.id} className="flex items-center gap-4 relative">
                     <div className={`matrix-notched-new no-corners w-8 h-8 flex items-center justify-center text-[12px] font-bold z-10 transition-all border
-                      ${s.status === 'ACTIVE' || s.status === 'WAITING' 
+                      ${s.status === 'ACTIVE' 
                         ? 'bg-black/80 text-[#00FF41] border-[#00FF41] shadow-[0_0_15px_rgba(0,255,65,0.2)]' 
-                        : 'bg-black/80 text-white border-[#00FFBD]/40'}`}
+                        : 'bg-black/80 text-[#00FFBD]/40 border-[#00FFBD]/20'}`}
                       style={{ '--notch-size': '4px' } as any}>
                       <span className="relative z-10">0{i + 1}</span>
                     </div>
                     <div className="flex flex-col z-10">
-                      <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'text-white' : 'text-[#00FFBD]/40'}`}>
+                      <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' ? 'text-white' : 'text-[#00FFBD]/30'}`}>
                         {s.label}
                       </div>
-                      <div className={`text-[11px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' || s.status === 'WAITING' ? 'text-[#00FF41] matrix-text-glow' : 'text-[#00FFBD]/20'}`}>
+                      <div className={`text-[11px] uppercase tracking-widest mt-1 ${s.status === 'ACTIVE' ? 'text-[#00FF41] matrix-text-glow' : 'text-[#00FFBD]/10'}`}>
                         {s.status}
                       </div>
                     </div>
@@ -470,7 +470,7 @@ export default function NoxDashboard() {
       </div>
 
       {/* FOOTER STATUS */}
-      <div className="matrix-notched-new absolute bottom-[130px] left-1/2 -translate-x-1/2 h-[90px] w-fit min-w-[700px] bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
+      <div className="matrix-notched-new absolute bottom-[130px] left-1/2 -translate-x-1/2 h-[90px] w-fit min-w-[700px] bg-black/90 flex items-center justify-center z-50">
         <div className="w-full h-full px-12 flex items-center justify-between gap-12 z-10">
           {[
             { label: 'ACTIVE', val: fullState ? (fullState.pipeline || []).filter((a: any) => a.status === 'in_progress').length : "--" },
