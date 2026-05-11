@@ -414,7 +414,13 @@ export default function NoxDashboard() {
           <NeuralCore
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             size={ringD * 0.7}
-            mode={state === "speaking" ? "talking" : state === "processing" ? "thinking" : "idle"}
+            mode={
+              state === "speaking" || currentAgents.some((a: any) => a.status === "WAITING") 
+                ? "talking" 
+                : state === "processing" 
+                  ? "thinking" 
+                  : "idle"
+            }
           />
 
           <div ref={orbitDashedRef} className="orbit-dashed" style={{ width: dashD, height: dashD }} />

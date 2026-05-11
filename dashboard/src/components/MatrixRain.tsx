@@ -29,7 +29,7 @@ const MatrixRain = () => {
     const draw = () => {
       // Сбрасываем тень перед заливкой фона, чтобы она не влияла на прозрачный прямоугольник
       ctx.shadowBlur = 0;
-      ctx.fillStyle = "rgba(0, 0, 0, 0.2)"; // Ускорил очистку для более коротких и четких шлейфов
+      ctx.fillStyle = "rgba(0, 0, 0, 0.11)"; // Ускорил очистку для более коротких и четких шлейфов
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.font = `${fontSize}px monospace`;

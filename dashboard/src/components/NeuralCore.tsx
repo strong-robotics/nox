@@ -180,13 +180,13 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         }
       });
       // 0. Outer Glass Rim Effect
-      const haloGrad = ctx.createRadialGradient(size/2, size/2, outerR - 15, size/2, size/2, outerR);
+      const haloGrad = ctx.createRadialGradient(size / 2, size / 2, outerR - 15, size / 2, size / 2, outerR);
       haloGrad.addColorStop(0, "rgba(0, 255, 65, 0)");
       haloGrad.addColorStop(0.8, "rgba(0, 255, 65, 0.15)");
       haloGrad.addColorStop(1, "rgba(0, 255, 65, 0.05)");
       ctx.strokeStyle = haloGrad;
       ctx.lineWidth = 15;
-      ctx.beginPath(); ctx.arc(size/2, size/2, outerR - 7.5, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(size / 2, size / 2, outerR - 7.5, 0, Math.PI * 2); ctx.stroke();
 
       // Layer 2: Concentric Razor Rings
       [0.985, 0.992, 1.0].forEach((rMult, idx) => {
@@ -194,16 +194,16 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         const time = Date.now() * 0.001;
         ctx.save();
         ctx.translate(canvas.width / 2 / dpr, canvas.height / 2 / dpr);
-        
+
         const breathe = (Math.sin(time * 0.8) + 1) / 2; // Значение от 0 до 1
         const opacity = 0.08 + (breathe * 0.10); // Плавно меняем яркость от 0.08 до 0.18
         const radius = size * 0.45;
-        
+
         const fog = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
         fog.addColorStop(0, `rgba(0, 255, 189, ${opacity})`);
         fog.addColorStop(0.5, `rgba(0, 255, 189, ${opacity * 0.5})`);
         fog.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        
+
         ctx.fillStyle = fog;
         ctx.beginPath();
         ctx.arc(0, 0, radius, 0, Math.PI * 2);
@@ -213,7 +213,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         ctx.beginPath();
         ctx.strokeStyle = idx === 1 ? "rgba(0, 255, 65, 0.4)" : "rgba(0, 255, 65, 0.1)";
         ctx.lineWidth = idx === 1 ? 0.7 : 0.4;
-        ctx.arc(size/2, size/2, (size / 2) * rMult - 1, 0, Math.PI * 2);
+        ctx.arc(size / 2, size / 2, (size / 2) * rMult - 1, 0, Math.PI * 2);
         ctx.stroke();
       });
 
@@ -221,19 +221,19 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
       ctx.beginPath();
       ctx.strokeStyle = "rgba(0, 255, 65, 0.1)";
       ctx.lineWidth = 0.5;
-      ctx.arc(size/2, size/2, (size / 2) * 0.8, 0, Math.PI * 2);
+      ctx.arc(size / 2, size / 2, (size / 2) * 0.8, 0, Math.PI * 2);
       ctx.stroke();
 
       // 2. Primary Main Grid
       ctx.save();
       ctx.beginPath();
-      ctx.arc(size/2, size/2, (size / 2) * 0.98, 0, Math.PI * 2);
+      ctx.arc(size / 2, size / 2, (size / 2) * 0.98, 0, Math.PI * 2);
       ctx.clip();
       ctx.strokeStyle = "rgba(0, 255, 65, 0.15)";
       ctx.lineWidth = 1.0;
       const SUB = 32;
-      const startX = (size/2) - Math.floor((size/2 + GRID_SIZE * 2) / GRID_SIZE) * GRID_SIZE;
-      const startY = (size/2) - Math.floor((size/2 + GRID_SIZE * 2) / GRID_SIZE) * GRID_SIZE;
+      const startX = (size / 2) - Math.floor((size / 2 + GRID_SIZE * 2) / GRID_SIZE) * GRID_SIZE;
+      const startY = (size / 2) - Math.floor((size / 2 + GRID_SIZE * 2) / GRID_SIZE) * GRID_SIZE;
       const endX = size + GRID_SIZE * 2;
       const endY = size + GRID_SIZE * 2;
       for (let x = startX; x <= endX; x += GRID_SIZE) {
@@ -270,10 +270,10 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
       const breathing = Math.sin(now / 700) * 0.2;
       const shimmer = Math.sin(now / 30) * 0.03;
       const coreOpacity = 0.35 + breathing * 0.15 + shimmer;
-      
+
       const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-      grad.addColorStop(0, "rgba(0, 0, 0, 0.9)"); 
-      grad.addColorStop(1, `rgba(0, 59, 0, ${coreOpacity * 0.3})`); 
+      grad.addColorStop(0, "rgba(0, 0, 0, 0.9)");
+      grad.addColorStop(1, `rgba(0, 59, 0, ${coreOpacity * 0.3})`);
       ctx.fillStyle = grad; ctx.fillRect(0, 0, size, size);
 
       drawGrid();
@@ -291,7 +291,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         if (cooldownsRef.current[key] > 0) cooldownsRef.current[key] -= dt_snakes;
       }
 
-      const targetCount = 12;
+      const targetCount = mode === "idle" ? 12 : 15;
       if (snakesRef.current.length < targetCount && Math.random() < 0.15) {
         snakesRef.current.push(initSnake());
       }
