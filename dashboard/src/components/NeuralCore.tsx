@@ -55,6 +55,8 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
   const lastRayPulseTimeRef = useRef(0);
   const lastTimeRef = useRef<number>(performance.now());
   const frameRef = useRef<number>(0);
+  const modeRef = useRef(mode);
+  useEffect(() => { modeRef.current = mode; }, [mode]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -116,7 +118,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         color: COLORS[Math.floor(Math.random() * (COLORS.length - 1))], // Avoid the darkest color
         currentDir: initialDir,
         progress: 1,
-        speed: (mode === "talking" ? 0.08 : mode === "thinking" ? 0.04 : 0.06) * (0.8 + Math.random() * 0.4),
+        speed: (modeRef.current === "talking" ? 0.08 : modeRef.current === "thinking" ? 0.04 : 0.06) * (0.8 + Math.random() * 0.4),
         maxTail,
         life: 0,
         maxLife: 480 + Math.random() * 120,
@@ -258,7 +260,8 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
       const dt_stable = Math.min(rawDelta, 2.0);
       lastTimeRef.current = now;
 
-      const targetSpeed = mode === "talking" ? 1.0 : mode === "thinking" ? 0.6 : 0.15;
+      const currentMode = modeRef.current;
+      const targetSpeed = currentMode === "talking" ? 1.0 : currentMode === "thinking" ? 0.6 : 0.15;
       if (!(window as any).noxSpeed) (window as any).noxSpeed = targetSpeed;
       (window as any).noxSpeed += (targetSpeed - (window as any).noxSpeed) * 0.1;
       const speedMult = (window as any).noxSpeed;
@@ -291,7 +294,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
         if (cooldownsRef.current[key] > 0) cooldownsRef.current[key] -= dt_snakes;
       }
 
-      const targetCount = mode === "idle" ? 12 : 15;
+      const targetCount = currentMode === "idle" ? 12 : 15;
       if (snakesRef.current.length < targetCount && Math.random() < 0.15) {
         snakesRef.current.push(initSnake());
       }
@@ -326,7 +329,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
           });
 
           if (validDirs.length > 0) {
-            const turnChance = mode === "thinking" ? 0.1 : mode === "talking" ? 0.45 : 0.3;
+            const turnChance = modeRef.current === "thinking" ? 0.1 : modeRef.current === "talking" ? 0.45 : 0.3;
             const canGoStraight = validDirs.some((d) => d.x === snake.currentDir.x && d.y === snake.currentDir.y);
             const nextDir = (canGoStraight && Math.random() > turnChance)
               ? snake.currentDir
@@ -423,7 +426,7 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
 
     frameRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frameRef.current);
-  }, [size, mode]);
+  }, [size]);
 
   return (
     <div
