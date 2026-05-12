@@ -164,10 +164,10 @@ class SystemObserver:
 
         # Variants for Agents
         agent_actives = [
-            f"The {role} is now active. I hope it's better than the last one.",
-            f"{role} online. Processing subroutines. Don't blink.",
-            f"The {role} has entered the grid. Let's hope for clean code this time.",
-            f"{role} is on it. Commencing execution, sir."
+            "The {role} is now active. I hope it's better than the last one.",
+            "{role} online. Processing subroutines. Don't blink.",
+            "The {role} has entered the grid. Let's hope for clean code this time.",
+            "{role} is on it. Commencing execution, sir."
         ]
 
         # Variants for Completion
