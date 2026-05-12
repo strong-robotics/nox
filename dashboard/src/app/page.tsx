@@ -69,7 +69,7 @@ function AgentStatusCard({ agent }: { agent: any }) {
 
   return (
     <div className={`matrix-notched-new relative flex-1 h-[105px] min-h-[105px] overflow-hidden group bg-black/90 ${isActive ? 'shadow-[0_0_20px_rgba(0,255,65,0.15)]' : ''}`}>
-      <div className="flex items-center gap-5 w-full h-full pl-4 z-10 relative">
+      <div className="flex items-center gap-5 w-full h-full pl-4 pr-4 z-10 relative">
         {/* Inner Icon Box - Rounded per example */}
         <div className={`w-10 h-10 rounded-md border border-[#00FFBD]/40 flex items-center justify-center text-[#00FFBD] flex-shrink-0 bg-black/40 ${isActive ? 'shadow-[0_0_12px_rgba(0,255,65,0.25)]' : ''}`}>
           <Icon kind={agent.icon} />
@@ -219,7 +219,7 @@ export default function NoxDashboard() {
     agentsRef.current = currentAgents;
   }, [currentAgents]);
 
-  const isActiveTask = !!(fullState?.current_task && fullState.current_task !== "None" && fullState.current_task !== "N/A");
+  const isActiveTask = !!(fullState?.current_task && fullState.current_task !== "None" && fullState.current_task !== "N/A") || currentAgents.some((a: any) => a.status === "ACTIVE");
 
   const currentTasks = useMemo(() => {
     if (!fullState || !fullState.tasks || !fullState.tasks.all_queued?.length) return [];
@@ -374,7 +374,17 @@ export default function NoxDashboard() {
 
       {/* RIGHT SIDEBAR - CURRENT TASK & PROGRESS */}
       <div className="absolute right-6 top-[140px] bottom-10 w-[320px] flex flex-col z-40">
-        <div className="mb-2 px-2 text-[10px] font-bold text-[#00FFBD] uppercase tracking-[0.3em] matrix-text-glow">CURRENT.PROCESS //</div>
+        <div className="mb-2 px-2 flex justify-between items-center">
+          <div className="text-[10px] font-bold text-[#00FFBD] uppercase tracking-[0.3em] matrix-text-glow">CURRENT.PROCESS //</div>
+          {isActiveTask && (
+            <div className="flex items-center gap-2">
+              <svg className="animate-spin h-3 w-3 text-[#00FFBD]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          )}
+        </div>
         <div className="matrix-notched-new flex-1 overflow-hidden bg-black/90 flex flex-col">
           <div className="p-5 flex flex-col gap-6 z-10 flex-1">
             {(() => {
@@ -384,7 +394,7 @@ export default function NoxDashboard() {
                 <div className="matrix-notched-new no-corners bg-[#00FFBD]/5" style={{ '--notch-size': '4px' } as any}>
                   <div className="p-4 z-10 relative">
                     <div className="text-[13px] font-bold text-white mb-2 leading-tight tracking-wide">
-                      {activeTask?.action || (isActiveTask ? fullState.current_task : "NO ACTIVE PROCESS")}
+                      {activeTask?.action || (isActiveTask && fullState ? fullState.current_task : "NO ACTIVE PROCESS")}
                     </div>
                     <div className="text-[11px] leading-relaxed text-[#00FFBD] font-light">
                       {activeTask?.instructions || "System idling. Awaiting next command sequence..."}
@@ -408,7 +418,7 @@ export default function NoxDashboard() {
                       style={{ '--notch-size': '4px' } as any}>
                       <span className="relative z-10">0{i + 1}</span>
                     </div>
-                    <div className="flex flex-col z-10">
+                    <div className="flex flex-col z-10 flex-1">
                       <div className={`text-[13px] font-bold tracking-[0.2em] uppercase ${s.status === 'ACTIVE' ? 'text-white' : 'text-[#00FFBD]/30'}`}>
                         {s.label}
                       </div>
@@ -416,6 +426,12 @@ export default function NoxDashboard() {
                         {s.status}
                       </div>
                     </div>
+                    {s.status === 'ACTIVE' && (
+                      <svg className="animate-spin h-4 w-4 text-[#00FF41] flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    )}
                   </div>
                 ))}
               </div>

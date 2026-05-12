@@ -21,9 +21,15 @@ import monitor # type: ignore
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global main_loop
+    global main_loop, is_running
     main_loop = asyncio.get_event_loop()
     asyncio.create_task(background_monitor())
+    
+    # Auto-start voice loop on boot so we don't depend on dashboard refresh
+    print("--- AUTO-STARTING VOICE GRID ---")
+    is_running = True
+    threading.Thread(target=voice_loop, daemon=True).start()
+    
     yield
 
 app = FastAPI(lifespan=lifespan)
@@ -107,9 +113,9 @@ def save_history(history):
 
 conversation_history = load_history() # Persistent memory
 
-# Load models (Using 'base' for speed and reliability)
-print("Loading Whisper model (base)...")
-stt_model = whisper.load_model("base")
+# Load models (Upgraded to 'medium' for maximum accuracy as requested)
+print("Loading Whisper model (medium)...")
+stt_model = whisper.load_model("medium")
 
 async def broadcast_state(state):
     try:
@@ -132,10 +138,86 @@ def broadcast_state_sync(state: str):
     if main_loop and main_loop.is_running():
         asyncio.run_coroutine_threadsafe(broadcast_state(state), main_loop)
 
+current_nox_state = "idle"
+
+import random
+
+class SystemObserver:
+    def __init__(self):
+        self.prev_pipeline = {}
+        self.prev_queued_count = 0
+        self.is_completed_announced = True 
+
+    def check_for_announcements(self, current_state):
+        announcements = []
+        current_queued = current_state.get("tasks", {}).get("queued", 0)
+        pipeline_data = current_state.get("pipeline", [])
+        pipeline = {a.get("role"): a.get("status") for a in pipeline_data if isinstance(a, dict)}
+        
+        # Variants for Architect
+        arch_starts = [
+            f"Architect is starting work. There are {current_queued} tasks remaining in the queue. Try not to make a mess, sir.",
+            f"The Architect is in. {current_queued} tasks left. Let's see if the plan holds up.",
+            f"Architect taking the lead. {current_queued} tasks to go. Efficiency is mandatory, Eugene.",
+            f"Strategy phase initiated. {current_queued} pending tasks. Don't break the reality, sir."
+        ]
+
+        # Variants for Agents
+        agent_actives = [
+            f"The {role} is now active. I hope it's better than the last one.",
+            f"{role} online. Processing subroutines. Don't blink.",
+            f"The {role} has entered the grid. Let's hope for clean code this time.",
+            f"{role} is on it. Commencing execution, sir."
+        ]
+
+        # Variants for Completion
+        completed_msgs = [
+            "All tasks have been successfully completed. I'll be here if you need more miracles.",
+            "Queue empty. All miracles delivered. What's next?",
+            "Tasks finished. The system is clean. I'm going back to counting stars.",
+            "Mission accomplished. You can relax now, Eugene. Or try to."
+        ]
+
+        # 2. Check Architect start
+        if pipeline.get("Architect") == "in_progress" and self.prev_pipeline.get("Architect") != "in_progress":
+            announcements.append(random.choice(arch_starts))
+            self.is_completed_announced = False
+            
+        # 3. Detect other agents
+        for role, status in pipeline.items():
+            if role == "Architect": continue
+            prev_status = self.prev_pipeline.get(role)
+            is_active = status in ["in_progress", "active", "ACTIVE"]
+            was_active = prev_status in ["in_progress", "active", "ACTIVE"]
+            
+            if is_active and not was_active:
+                announcements.append(random.choice([m.format(role=role) for m in agent_actives]))
+
+        # 4. Detect all tasks completed
+        if current_queued == 0 and not self.is_completed_announced:
+            all_idle = all(s in ["waiting", "completed", "idle", None] for s in pipeline.values())
+            if all_idle and pipeline:
+                announcements.append(random.choice(completed_msgs))
+                self.is_completed_announced = True
+
+        self.prev_pipeline = pipeline
+        self.prev_queued_count = current_queued
+        return announcements
+
 async def background_monitor():
     """Periodically pushes state to UI and keeps Ollama model warm."""
     tick = 0
     while True:
+        # Get full state for both UI and autonomous logic
+        state_data = monitor.get_full_system_state()
+        
+        # Autonomous announcements (Requirement: only speak if awake)
+        if is_awake:
+            new_announcements = observer.check_for_announcements(state_data)
+            for msg in new_announcements:
+                # We use a thread to not block the monitor loop
+                threading.Thread(target=nox_say, args=(msg,), daemon=True).start()
+
         await broadcast_state(current_nox_state)
         tick += 1
         # Every 5 minutes ping Ollama so model stays loaded in memory
@@ -151,7 +233,7 @@ async def background_monitor():
                 pass
         await asyncio.sleep(2)
 
-current_nox_state = "idle"
+observer = SystemObserver()
 
 
 @app.post("/kill-agent")
@@ -260,7 +342,7 @@ def process_voice_command(text, is_greeting=False):
     
     # Check for Wake Word
     text_lower = text.lower()
-    wake_triggers = ["wake up", "hey", "nox", "hello nox"]
+    wake_triggers = ["wake up", "hey", "nox", "hello nox", "odin", "hey odin", "hey! odin"]
     
     if not is_awake and not is_greeting:
         if any(trigger in text_lower for trigger in wake_triggers):
@@ -281,6 +363,7 @@ def process_voice_command(text, is_greeting=False):
     broadcast_state_sync("processing")
     context = get_system_context()
     memory = load_memory()
+    structure = get_directory_structure(PROJECT_ROOT)
     
     memories = memory.get("memories", [])
     memory_block = ""
@@ -290,21 +373,36 @@ def process_voice_command(text, is_greeting=False):
             memory_block += f"- [{m['category']}] {m['text']}\n"
         memory_block += "These are facts and preferences — follow them strictly.\n"
 
+    # Unified Reality Logic: Merge live process data with pipeline status
+    live_roles = {a.get('role'): a.get('env') for a in context.get('live_agents', []) if a.get('alive')}
+    unified_status = []
+    for agent in context.get('pipeline', []):
+        role = agent.get('role')
+        logical_status = agent.get('status', 'unknown')
+        if role in live_roles:
+            unified_status.append(f"{role}: {logical_status.upper()} (Running via {live_roles[role]})")
+        else:
+            unified_status.append(f"{role}: OFFLINE (Process not detected)")
+
     system_prompt = f"""
-You are NOX, a sharp-witted AI assistant. Eugene is your creator.
+You are ODIN (formerly NOX), a sharp-witted AI assistant. Eugene is your creator.
 RULES:
 1. Keep it simple and natural. No jargon.
-2. BREVITY: Be concise but informative. If asked about status, give a full overview.
-3. PERSONALITY: Cool, direct, slightly sarcastic.
+2. BREVITY: EXTREME BREVITY is mandatory. Use 1 sentence maximum. Never use filler phrases.
+3. PERSONALITY: Cool, direct, sharp-witted, slightly sarcastic. You are a high-end AI assistant.
 4. LANGUAGE: ALWAYS respond in English, even if Eugene speaks another language.
-5. FACTS: Use the data below to answer Eugene about tasks and agents.
+5. MEMORY: Use your long-term memory to show you remember Eugene's habits and past context.
 
-REAL-TIME SYSTEM STATE:
-- Tasks: {context.get('tasks', {}).get('completed', 0)} completed, {context.get('tasks', {}).get('queued', 0)} in queue.
-- Current Task: {context.get('current_task', 'N/A')}
-- Pipeline Status: {", ".join([f"{a.get('role', 'Unknown')}: {a.get('status', 'unknown')}" for a in context.get('pipeline', []) if isinstance(a, dict)])}
-- Live Agents (Processes): {", ".join([f"{a.get('role')} ({a.get('env')})" for a in context.get('live_agents', []) if a.get('alive')]) or "None"}
+UNIFIED AGENT STATUS (REAL-WORLD):
+{chr(10).join(unified_status)}
+
+SYSTEM METRICS:
 - Codex: {context.get('codex', {}).get('state', 'OFF')} / {context.get('codex', {}).get('model', 'N/A')}
+- Current Task: {context.get('current_task', 'None')}
+- Queue: {context.get('tasks', {}).get('queued', 0)} pending, {context.get('tasks', {}).get('completed', 0)} finished.
+
+PROJECT STRUCTURE:
+{", ".join(structure)}
 
 {memory_block}
 
@@ -321,7 +419,7 @@ Only add a tag when something genuinely new was said. Never repeat what is alrea
 """
 
     if is_greeting:
-        prompt = "System initialized. Greet Eugene as NOX."
+        prompt = "System initialized. Greet Eugene as ODIN."
     else:
         prompt = text
 
@@ -432,12 +530,15 @@ def voice_loop():
                 if max_vol > 0:
                     audio_resampled = audio_resampled / max_vol
 
+                # Higher quality transcription with context bias
                 result = stt_model.transcribe(
                     audio_resampled,
-                    language='en',
+                    language='en', # Back to English only as requested
+                    initial_prompt="Odin, Eugene, Architect, Developer, Designer, Tester, Jarvis, task, queue.",
                     condition_on_previous_text=False,
-                    no_speech_threshold=0.5,
+                    no_speech_threshold=0.6,
                     logprob_threshold=-1.0,
+                    fp16=False # safer for various hardware
                 )
                 text = result["text"].strip()
                 no_speech = result["segments"][0]["no_speech_prob"] if result["segments"] else 1.0
