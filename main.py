@@ -44,6 +44,8 @@ app.add_middleware(
 )
 
 # --- CONFIGURATION ---
+OLLAMA_MODEL = "llama3.2"
+OLLAMA_URL = "http://localhost:11434"
 TASKS_FILE = os.path.join(PROJECT_ROOT, "multi-agent.tasks.txt")
 STATUS_FILE = os.path.join(PROJECT_ROOT, "multi-agent/status.json")
 PIPER_MODEL = os.path.join(PROJECT_ROOT, "piper_models/en_GB-alan-medium.onnx")
@@ -113,9 +115,12 @@ def save_history(history):
 
 conversation_history = load_history() # Persistent memory
 
-# Load models (Upgraded to 'medium' for maximum accuracy as requested)
-print("Loading Whisper model (medium)...")
-stt_model = whisper.load_model("medium")
+# Load models (Optimized for M3 GPU)
+print("Loading Whisper model (turbo)...")
+import torch
+device = "mps" if torch.backends.mps.is_available() else "cpu"
+print(f"--- STT Device: {device} ---")
+stt_model = whisper.load_model("turbo", device=device)
 
 async def broadcast_state(state):
     try:
@@ -384,39 +389,16 @@ def process_voice_command(text, is_greeting=False):
         else:
             unified_status.append(f"{role}: OFFLINE (Process not detected)")
 
-    system_prompt = f"""
-You are ODIN (formerly NOX), a sharp-witted AI assistant. Eugene is your creator.
-RULES:
-1. Keep it simple and natural. No jargon.
-2. BREVITY: EXTREME BREVITY is mandatory. Use 1 sentence maximum. Never use filler phrases.
-3. PERSONALITY: Cool, direct, sharp-witted, slightly sarcastic. You are a high-end AI assistant.
-4. LANGUAGE: ALWAYS respond in English, even if Eugene speaks another language.
-5. MEMORY: Use your long-term memory to show you remember Eugene's habits and past context.
-
-UNIFIED AGENT STATUS (REAL-WORLD):
-{chr(10).join(unified_status)}
-
-SYSTEM METRICS:
-- Codex: {context.get('codex', {}).get('state', 'OFF')} / {context.get('codex', {}).get('model', 'N/A')}
-- Current Task: {context.get('current_task', 'None')}
-- Queue: {context.get('tasks', {}).get('queued', 0)} pending, {context.get('tasks', {}).get('completed', 0)} finished.
-
-PROJECT STRUCTURE:
-{", ".join(structure)}
-
-{memory_block}
-
-When reporting status, ALWAYS mention:
-- The NAME of the current task.
-- Which agent is currently active or whose turn it is.
-- How many tasks are remaining in the queue.
-
-HOW TO SAVE MEMORIES:
-If Eugene tells you something worth remembering — about himself, his life, work, habits, preferences, or instructions for you — add ONE tag at the end of your response:
-[MEM:category|text]
-Categories: behavior (how you should act), personal (about Eugene), work (project/job), habit (routines), other
-Only add a tag when something genuinely new was said. Never repeat what is already in memory.
-"""
+    system_prompt = (
+        "You are ODIN, a technical AI partner. "
+        "TONE: Sharp, professional, brief. "
+        "AGENTS: Architect, Designer, Developer, Tester. No others exist. "
+        "RULES: Respond in 1-2 sentences MAX. Never hallucinate new agents. "
+        f"MEMORIES: {memory_block} "
+        f"CONTEXT: Tasks: {context.get('tasks', {}).get('queued', 0)} queued, {context.get('tasks', {}).get('completed', 0)} done. "
+        f"Current: {context.get('current_task', 'None')}. "
+        "ALWAYS respond in English."
+    )
 
     if is_greeting:
         prompt = "System initialized. Greet Eugene as ODIN."
@@ -424,14 +406,21 @@ Only add a tag when something genuinely new was said. Never repeat what is alrea
         prompt = text
 
     conversation_history.append({"role": "user", "content": prompt})
-    if len(conversation_history) > 15:
-        conversation_history = conversation_history[-15:]
+    if len(conversation_history) > 8:
+        conversation_history = conversation_history[-8:]
     save_history(conversation_history)
 
     try:
+        start_llm = time.time()
         messages = [{"role": "system", "content": system_prompt}] + conversation_history
-        response = ollama.chat(model='llama3.2', messages=messages, options={"temperature": 0.8})
+        response = ollama.chat(model=OLLAMA_MODEL, messages=messages, options={
+            "temperature": 0.8,
+            "top_p": 0.9,
+            "num_predict": 150
+        })
         answer = response['message']['content']
+        llm_time = time.time() - start_llm
+        print(f"DEBUG: LLM Response time: {llm_time:.2f}s")
         
         if "[MEM:" in answer:
             tag = answer.split("[MEM:")[1].split("]")[0].strip()
@@ -474,7 +463,7 @@ def voice_loop():
     global is_running, is_awake
     target_fs = 16000
     chunk_size = 1024
-    silence_duration_limit = 1.0
+    silence_duration_limit = 0.7 # Faster cutoff
 
     while is_running:
         try:
@@ -531,15 +520,16 @@ def voice_loop():
                     audio_resampled = audio_resampled / max_vol
 
                 # Higher quality transcription with context bias
+                start_stt = time.time()
                 result = stt_model.transcribe(
                     audio_resampled,
-                    language='en', # Back to English only as requested
+                    language='en',
                     initial_prompt="Odin, Eugene, Architect, Developer, Designer, Tester, Jarvis, task, queue.",
                     condition_on_previous_text=False,
-                    no_speech_threshold=0.6,
-                    logprob_threshold=-1.0,
-                    fp16=False # safer for various hardware
+                    fp16=True if device == "mps" else False
                 )
+                stt_time = time.time() - start_stt
+                print(f"DEBUG: STT Transcription time: {stt_time:.2f}s")
                 text = result["text"].strip()
                 no_speech = result["segments"][0]["no_speech_prob"] if result["segments"] else 1.0
 

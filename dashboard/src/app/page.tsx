@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import NeuralCore from "@/components/NeuralCore";
 import MatrixRain from "@/components/MatrixRain";
+import DataGrid from "@/app/components/DataGrid";
 
 const fmtTime = (iso: string) => {
   if (!iso) return "";
@@ -315,7 +316,8 @@ export default function NoxDashboard() {
 
   return (
     <main className="relative w-full h-screen bg-black text-[#00FFBD] font-mono overflow-hidden">
-      <MatrixRain />
+      {/* <MatrixRain /> */}
+      <DataGrid />
 
       {/* GLOBAL BACKGROUND ELEMENTS */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -444,8 +446,8 @@ export default function NoxDashboard() {
       <div className="w-full h-full relative flex items-center justify-center">
         <div ref={stageRef} className="relative w-[min(900px,90vmin)] h-[min(900px,90vmin)]">
 
-          <div 
-            ref={coreContainerRef} 
+          <div
+            ref={coreContainerRef}
             className="absolute left-1/2 top-1/2"
             style={{ width: ringD * 0.7, height: ringD * 0.7 }}
           >
