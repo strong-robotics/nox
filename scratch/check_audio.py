@@ -1,6 +1,6 @@
 import sounddevice as sd
 
-print("--- ДОСТУПНЫЕ АУДИО-УСТРОЙСТВА ---")
+print("--- AVAILABLE AUDIO DEVICES ---")
 devices = sd.query_devices()
 for i, d in enumerate(devices):
     kind = ""
@@ -12,6 +12,6 @@ for i, d in enumerate(devices):
     
     print(f"{i}: {d['name']}{kind}{default}")
 
-print("\n--- ТЕКУЩИЕ НАСТРОЙКИ ПО УМОЛЧАНИЮ ---")
+print("\n--- CURRENT DEFAULT SETTINGS ---")
 print(f"Input: {sd.default.device[0]}")
 print(f"Output: {sd.default.device[1]}")

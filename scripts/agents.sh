@@ -3,6 +3,9 @@
 
 set -uo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
 RUNTIME_DIR="multi-agent/.runtime"
 STATUS_FILE="multi-agent/status.json"
 
@@ -21,6 +24,17 @@ is_known_pid() {
   for p in "${PIDS[@]+"${PIDS[@]}"}"; do [[ "$p" == "$1" ]] && return 0; done
   return 1
 }
+
+# VSCode
+while IFS= read -r line; do
+  script_pid=$(echo "$line" | awk '{print $2}')
+  cmd=$(echo "$line" | awk '{for(i=11;i<=NF;i++) printf $i" "; print ""}')
+  role=$(echo "$cmd" | grep -o 'vscode_wait_for_status\.py [A-Za-z]*' | awk '{print $2}')
+  [[ -z "$role" ]] && role=$(echo "$cmd" | grep -o 'vscode_wait_for_task\.py' | sed 's/vscode_wait_for_task\.py/Architect/')
+  [[ -z "$role" ]] && role="unknown"
+  is_known_pid "$script_pid" && continue
+  add_agent "vscode $role" "$script_pid"
+done < <(ps aux | grep "vscode_wait_for_" | grep -v grep || true)
 
 # Antigravity
 while IFS= read -r line; do

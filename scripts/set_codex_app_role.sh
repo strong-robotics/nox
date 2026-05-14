@@ -3,6 +3,9 @@
 
 set -euo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
 ROLE_INPUT="${1:-}"
 ROLE_INPUT_LC="$(printf '%s' "$ROLE_INPUT" | tr '[:upper:]' '[:lower:]')"
 

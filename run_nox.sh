@@ -9,7 +9,7 @@ echo "--- INITIALIZING NOX ECOSYSTEM ---"
 # 1. Start Backend (FastAPI)
 echo "[1/2] Starting NOX Brain (Backend) on port 777..."
 source "$ROOT_DIR/venv/bin/activate"
-python3 "$ROOT_DIR/main.py" &
+python3 "$ROOT_DIR/scripts/main.py" &
 BACKEND_PID=$!
 
 # 2. Start Frontend (Next.js)

@@ -3,6 +3,9 @@
 
 set -uo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
 RUNTIME_DIR="multi-agent/.runtime"
 STATUS_FILE="multi-agent/status.json"
 

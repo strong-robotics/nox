@@ -91,7 +91,7 @@ function AgentStatusCard({ agent }: { agent: any }) {
           </div>
         </div>
 
-        {/* Временно скрыто по запросу пользователя */}
+        {/* Temporarily hidden per user request */}
         {/* {isLive && (agent.pid || agent.agentId) && (
           <button
             onClick={async () => {
@@ -519,9 +519,8 @@ export default function NoxDashboard() {
       <div className="matrix-notched-new absolute bottom-[130px] left-1/2 -translate-x-1/2 h-[90px] w-fit min-w-[700px] bg-black/90 flex items-center justify-center z-50">
         <div className="w-full h-full px-12 flex items-center justify-between gap-12 z-10">
           {[
-            { label: 'ACTIVE', val: fullState ? (fullState.pipeline || []).filter((a: any) => a.status === 'in_progress').length : "--" },
+            { label: 'IN QUEUE', val: fullState ? (fullState.tasks?.queued || 0) : "--" },
             { label: 'COMPLETED', val: fullState ? (fullState.tasks?.completed || 0) : "--" },
-            { label: 'QUEUED', val: fullState ? (fullState.tasks?.queued || 0) : "--" },
             { label: 'TOTAL', val: fullState ? (fullState.tasks?.completed || 0) + (fullState.tasks?.queued || 0) : "--" }
           ].map(stat => (
             <div key={stat.label} className="flex items-center gap-4">

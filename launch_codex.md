@@ -26,7 +26,7 @@ Important:
 Check current state:
 
 ```bash
-bash agents.sh
+bash scripts/agents.sh
 cat multi-agent/.runtime/codex_app_current_role.json
 ```
 
@@ -46,7 +46,7 @@ Paste this into the Codex.app chat:
 
 ```text
 COMMAND: INITIALIZE ROLE [ARCHITECT - CODEX_APP].
-1. EXECUTE IMMEDIATE: `bash set_codex_app_role.sh architect`.
+1. EXECUTE IMMEDIATE: `bash scripts/set_codex_app_role.sh architect`.
 2. LOAD instructions from `./multi-agent/core/shared_architect.md`, `./multi-agent/core/codex_app_chat.md`, and `./multi-agent/core/shared_global_rules.md`.
 3. ENSURE HEARTBEAT: create or update a Codex.app heartbeat for this current thread every 2 minutes. The heartbeat must read `./multi-agent/.runtime/codex_app_current_role.json` on every wake and follow the selected role.
 4. ROLE = Architect.
@@ -60,7 +60,7 @@ COMMAND: INITIALIZE ROLE [ARCHITECT - CODEX_APP].
 ### Verify
 
 ```bash
-bash agents.sh
+bash scripts/agents.sh
 ```
 
 Expected:
@@ -80,7 +80,7 @@ Paste this into the Codex.app chat:
 
 ```text
 COMMAND: INITIALIZE ROLE [DESIGNER - CODEX_APP].
-1. EXECUTE IMMEDIATE: `bash set_codex_app_role.sh designer`.
+1. EXECUTE IMMEDIATE: `bash scripts/set_codex_app_role.sh designer`.
 2. LOAD instructions from `./multi-agent/core/shared_designer.md`, `./multi-agent/core/codex_app_chat.md`, and `./multi-agent/core/shared_global_rules.md`.
 3. ENSURE HEARTBEAT: create or update a Codex.app heartbeat for this current thread every 2 minutes. The heartbeat must read `./multi-agent/.runtime/codex_app_current_role.json` on every wake and follow the selected role.
 4. ROLE = Designer.
@@ -94,7 +94,7 @@ COMMAND: INITIALIZE ROLE [DESIGNER - CODEX_APP].
 ### Verify
 
 ```bash
-bash agents.sh
+bash scripts/agents.sh
 ```
 
 Expected:
@@ -114,7 +114,7 @@ Paste this into the Codex.app chat:
 
 ```text
 COMMAND: INITIALIZE ROLE [DEVELOPER - CODEX_APP].
-1. EXECUTE IMMEDIATE: `bash set_codex_app_role.sh developer`.
+1. EXECUTE IMMEDIATE: `bash scripts/set_codex_app_role.sh developer`.
 2. LOAD instructions from `./multi-agent/core/shared_developer.md`, `./multi-agent/core/codex_app_chat.md`, and `./multi-agent/core/shared_global_rules.md`.
 3. ENSURE HEARTBEAT: create or update a Codex.app heartbeat for this current thread every 2 minutes. The heartbeat must read `./multi-agent/.runtime/codex_app_current_role.json` on every wake and follow the selected role.
 4. ROLE = Developer.
@@ -128,7 +128,7 @@ COMMAND: INITIALIZE ROLE [DEVELOPER - CODEX_APP].
 ### Verify
 
 ```bash
-bash agents.sh
+bash scripts/agents.sh
 ```
 
 Expected:
@@ -148,7 +148,7 @@ Paste this into the Codex.app chat:
 
 ```text
 COMMAND: INITIALIZE ROLE [TESTER - CODEX_APP].
-1. EXECUTE IMMEDIATE: `bash set_codex_app_role.sh tester`.
+1. EXECUTE IMMEDIATE: `bash scripts/set_codex_app_role.sh tester`.
 2. LOAD instructions from `./multi-agent/core/shared_tester.md`, `./multi-agent/core/codex_app_chat.md`, and `./multi-agent/core/shared_global_rules.md`.
 3. ENSURE HEARTBEAT: create or update a Codex.app heartbeat for this current thread every 2 minutes. The heartbeat must read `./multi-agent/.runtime/codex_app_current_role.json` on every wake and follow the selected role.
 4. ROLE = Tester.
@@ -162,7 +162,7 @@ COMMAND: INITIALIZE ROLE [TESTER - CODEX_APP].
 ### Verify
 
 ```bash
-bash agents.sh
+bash scripts/agents.sh
 ```
 
 Expected:
@@ -195,20 +195,20 @@ It is more autonomous, but it costs more Codex usage.
 Run from project root:
 
 ```bash
-bash start_codex.sh architect
+bash scripts/start_codex.sh architect
 ```
 
 ### Check
 
 ```bash
-bash status_codex.sh architect
-bash agents.sh
+bash scripts/status_codex.sh architect
+bash scripts/agents.sh
 ```
 
 ### Stop
 
 ```bash
-bash stop_codex.sh architect
+bash scripts/stop_codex.sh architect
 ```
 
 ### Manual Boot String
@@ -232,20 +232,20 @@ COMMAND: INITIALIZE ROLE [ARCHITECT - CODEX].
 Run from project root:
 
 ```bash
-bash start_codex.sh designer
+bash scripts/start_codex.sh designer
 ```
 
 ### Check
 
 ```bash
-bash status_codex.sh designer
-bash agents.sh
+bash scripts/status_codex.sh designer
+bash scripts/agents.sh
 ```
 
 ### Stop
 
 ```bash
-bash stop_codex.sh designer
+bash scripts/stop_codex.sh designer
 ```
 
 ### Manual Boot String
@@ -269,20 +269,20 @@ COMMAND: INITIALIZE ROLE [DESIGNER - CODEX].
 Run from project root:
 
 ```bash
-bash start_codex.sh developer
+bash scripts/start_codex.sh developer
 ```
 
 ### Check
 
 ```bash
-bash status_codex.sh developer
-bash agents.sh
+bash scripts/status_codex.sh developer
+bash scripts/agents.sh
 ```
 
 ### Stop
 
 ```bash
-bash stop_codex.sh developer
+bash scripts/stop_codex.sh developer
 ```
 
 ### Manual Boot String
@@ -306,20 +306,20 @@ COMMAND: INITIALIZE ROLE [DEVELOPER - CODEX].
 Run from project root:
 
 ```bash
-bash start_codex.sh tester
+bash scripts/start_codex.sh tester
 ```
 
 ### Check
 
 ```bash
-bash status_codex.sh tester
-bash agents.sh
+bash scripts/status_codex.sh tester
+bash scripts/agents.sh
 ```
 
 ### Stop
 
 ```bash
-bash stop_codex.sh tester
+bash scripts/stop_codex.sh tester
 ```
 
 ### Manual Boot String
@@ -341,7 +341,7 @@ COMMAND: INITIALIZE ROLE [TESTER - CODEX].
 Use Codex.app chat as Developer:
 
 ```bash
-bash set_codex_app_role.sh developer
+bash scripts/set_codex_app_role.sh developer
 ```
 
 Then paste the `CODEX_APP Developer` boot string above and enable heartbeat in this chat.
@@ -349,11 +349,11 @@ Then paste the `CODEX_APP Developer` boot string above and enable heartbeat in t
 Use autonomous CLI Codex as Developer:
 
 ```bash
-bash start_codex.sh developer
+bash scripts/start_codex.sh developer
 ```
 
 Check everything:
 
 ```bash
-bash agents.sh
+bash scripts/agents.sh
 ```

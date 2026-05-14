@@ -107,22 +107,35 @@ const DataGrid: React.FC = () => {
 
       let animationId: number;
       const animate = () => {
-        const spawnRate = 25; // Adjusted for ~2.2% screen coverage
+        // 3. Flicker Spawn
+        const spawnRate = 25; 
         for (let i = 0; i < spawnRate; i++) {
           if (Math.random() > 0.90) {
             const r = Math.floor(Math.random() * rows), c = Math.floor(Math.random() * columns);
-            
             if (!activeFlickers.current.some(f => f.r === r && f.c === c)) {
               activeFlickers.current.push({
-                r, c,
-                phase: 0,
+                r, c, phase: 0,
                 speed: 0.005 + Math.random() * 0.02,
-                // Wide range: from faint ghost to bright signal
                 maxOpacity: 0.15 + Math.random() * 0.8
               });
             }
           }
         }
+
+        // 4. Character Mutation (The "Living Data" effect)
+        const mutationRate = 400; 
+        for (let i = 0; i < mutationRate; i++) {
+          // Additional probability check to vary the "timing" of updates
+          if (Math.random() > 0.85) { 
+            const targetIdx = Math.floor(Math.random() * grid.current.length);
+            if (grid.current[targetIdx]) {
+              grid.current[targetIdx].char = hexChars[Math.floor(Math.random() * hexChars.length)];
+              grid.current[targetIdx].op = 0.04 + Math.random() * 0.11;
+              grid.current[targetIdx].hue = 140 + Math.random() * 40;
+            }
+          }
+        }
+
         draw();
         animationId = requestAnimationFrame(animate);
       };

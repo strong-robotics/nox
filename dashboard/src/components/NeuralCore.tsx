@@ -192,13 +192,13 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
 
       // Layer 2: Concentric Razor Rings
       [0.985, 0.992, 1.0].forEach((rMult, idx) => {
-        // 0. Эффект "дыхания" центрального ядра (статичное облако с пульсацией яркости)
+        // 0. Central core 'breathing' effect (static cloud with brightness pulse)
         const time = Date.now() * 0.001;
         ctx.save();
         ctx.translate(canvas.width / 2 / dpr, canvas.height / 2 / dpr);
 
-        const breathe = (Math.sin(time * 0.8) + 1) / 2; // Значение от 0 до 1
-        const opacity = 0.08 + (breathe * 0.10); // Плавно меняем яркость от 0.08 до 0.18
+        const breathe = (Math.sin(time * 0.8) + 1) / 2; // Value from 0 to 1
+        const opacity = 0.08 + (breathe * 0.10); // Smoothly transition brightness from 0.08 to 0.18
         const radius = size * 0.45;
 
         const fog = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
@@ -363,19 +363,19 @@ export default function NeuralCore({ size = 400, mode = "idle", className = "" }
 
           const segmentAlpha = (0.2 + 0.8 * (i / snake.points.length)) * lifeAlpha;
 
-          ctx.lineWidth = 5.0; // Было 4.0
+          ctx.lineWidth = 5.0; 
           ctx.strokeStyle = snake.color;
-          ctx.globalAlpha = segmentAlpha * 0.3; // Было 0.2
+          ctx.globalAlpha = segmentAlpha * 0.3; 
           strokeWarpedSegment(p1.x, p1.y, x2, y2, 10);
 
-          ctx.lineWidth = 2.5; // Было 1.5
+          ctx.lineWidth = 2.5; 
           ctx.strokeStyle = snake.color;
-          ctx.globalAlpha = segmentAlpha * 0.8; // Было 0.6
+          ctx.globalAlpha = segmentAlpha * 0.8; 
           strokeWarpedSegment(p1.x, p1.y, x2, y2, 10);
 
-          ctx.lineWidth = 1.8; // Было 0.8
+          ctx.lineWidth = 1.8; 
           ctx.strokeStyle = "#ffffff";
-          ctx.globalAlpha = segmentAlpha * 1.0; // Было 0.9
+          ctx.globalAlpha = segmentAlpha * 1.0; 
           strokeWarpedSegment(p1.x, p1.y, x2, y2, 10);
         }
         ctx.restore();

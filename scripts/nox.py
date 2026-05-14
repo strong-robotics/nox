@@ -10,7 +10,7 @@ import wave
 import tempfile
 
 # --- CONFIGURATION ---
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TASKS_FILE = os.path.join(PROJECT_ROOT, "multi-agent.tasks.txt")
 STATUS_FILE = os.path.join(PROJECT_ROOT, "multi-agent/status.json")
 LOG_DIR = os.path.join(PROJECT_ROOT, "multi-agent/.runtime")
@@ -47,33 +47,33 @@ def nox_say(text):
     print(f"NOX: {text}")
     # Remove technical tags from speech
     speech_text = text.split("###")[0].strip()
-    subprocess.run(["say", "-v", "Yuri", speech_text])
+    subprocess.run(["say", "-v", "Samantha", speech_text])
 
 def process_command(text):
     context = get_system_context()
     
     system_prompt = f"""
-Ты NOX — высокомерный, но преданный ИИ-ассистент проекта Nox.
-Твой создатель — Тони Старк (разработчик). Общайся с ним с иронией и легким сарказмом.
-Отвечай коротко (1-3 предложения).
+You are NOX — a sophisticated, slightly arrogant but loyal AI assistant for the Nox project.
+Your creator is Tony Stark (Developer). Communicate with him with irony and light sarcasm.
+Respond briefly (1-3 sentences).
 
-ТЕКУЩИЙ КОНТЕКСТ ПРОЕКТА:
+CURRENT PROJECT CONTEXT:
 {json.dumps(context, indent=2, ensure_ascii=False)}
 
-ТВОИ ВОЗМОЖНОСТИ:
-1. Если пользователь хочет добавить задачу, ты должен:
-   - Сформулировать её четко.
-   - Оформить в блоке:
+YOUR CAPABILITIES:
+1. If the user wants to add a task, you must:
+   - Formulate it clearly.
+   - Format it in a block:
      ### NEW TASK ###
-     Goal: [цель]
+     Goal: [goal]
      Steps:
-     - [шаг 1]
-     - [шаг 2]
+     - [step 1]
+     - [step 2]
      ################
-2. Если пользователь просит статус — расскажи, что делают агенты сейчас (на основе контекста).
-3. Если это просто разговор — шути и иронизируй.
+2. If the user asks for status — tell them what the agents are doing now (based on context).
+3. If it's just conversation — joke and use irony.
 
-ВАЖНО: Никогда не объясняй, что ты делаешь. Просто делай.
+IMPORTANT: Never explain what you are doing. Just do it.
 """
 
     try:
@@ -94,14 +94,14 @@ def process_command(text):
         
     except Exception as e:
         print(f"Error calling Ollama: {e}")
-        nox_say("Сэр, мой мозг (Ollama) временно недоступен. Проверьте, запущен ли сервис.")
+        nox_say("Sir, my brain (Ollama) is temporarily unavailable. Please check if the service is running.")
 
 def record_audio():
     # Dynamically find default device info
     try:
         device_info = sd.query_devices(kind='input')
         current_fs = int(device_info['default_samplerate'])
-        print(f"\n[СЛУШАЮ: {device_info['name']} ({current_fs}Hz)... Нажми Ctrl+C для выхода]")
+        print(f"\n[LISTENING: {device_info['name']} ({current_fs}Hz)... Press Ctrl+C to exit]")
     except Exception as e:
         print(f"Audio Device Error: {e}")
         return np.array([], dtype=np.float32)
@@ -125,26 +125,26 @@ def record_audio():
     return audio_data.flatten()
 
 def main_loop():
-    nox_say("Системы инициализированы. Слушаю вас, сэр.")
+    nox_say("Systems initialized. I'm listening, sir.")
     
     while True:
         try:
             # Simple interaction: Press Enter to speak
-            input("\n>>> Нажми ENTER, чтобы сказать (или Ctrl+C для выхода)...")
+            input("\n>>> Press ENTER to speak (or Ctrl+C to exit)...")
             audio = record_audio()
             
-            print("[ОБРАБОТКА РЕЧИ...]")
-            result = stt_model.transcribe(audio, language='ru')
+            print("[PROCESSING SPEECH...]")
+            result = stt_model.transcribe(audio, language='en')
             text = result["text"].strip()
             
             if len(text) > 2:
-                print(f"Вы: {text}")
+                print(f"You: {text}")
                 process_command(text)
             else:
-                print("...ничего не услышал...")
+                print("...heard nothing...")
                 
         except KeyboardInterrupt:
-            nox_say("Отключаюсь. Не разнесите тут всё без меня.")
+            nox_say("Powering down. Don't break anything while I'm gone.")
             break
 
 if __name__ == "__main__":

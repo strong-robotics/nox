@@ -62,3 +62,7 @@ design/
 # runtime
 multi-agent/.runtime/
 /multi-agent/.runtime/
+
+# other
+multi-agent/core/history
+multi-agent/core/artifacts

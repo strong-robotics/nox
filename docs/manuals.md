@@ -127,7 +127,7 @@ Output:
 If agents crash or the pipeline gets stuck, run from the **project root**:
 
 ```bash
-bash reset.sh
+bash scripts/reset.sh
 ```
 
 Or with explicit path if you're in a subdirectory:

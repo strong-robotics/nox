@@ -19,10 +19,10 @@ multi-agent/.runtime/codex_app_current_role.json
 Set it from the project root:
 
 ```bash
-bash set_codex_app_role.sh architect
-bash set_codex_app_role.sh designer
-bash set_codex_app_role.sh developer
-bash set_codex_app_role.sh tester
+bash scripts/set_codex_app_role.sh architect
+bash scripts/set_codex_app_role.sh designer
+bash scripts/set_codex_app_role.sh developer
+bash scripts/set_codex_app_role.sh tester
 ```
 
 The selected role determines which shared role file to load:
@@ -55,16 +55,16 @@ This is the reliable Codex.app mode. It does not depend on a long-lived Python p
 The cheap Python waiter can still be used when the user starts it from a normal terminal:
 
 ```bash
-bash start_codex_app.sh <role>
+bash scripts/start_codex_app.sh <role>
 ```
 
 Examples:
 
 ```bash
-bash start_codex_app.sh architect
-bash start_codex_app.sh designer
-bash start_codex_app.sh developer
-bash start_codex_app.sh tester
+bash scripts/start_codex_app.sh architect
+bash scripts/start_codex_app.sh designer
+bash scripts/start_codex_app.sh developer
+bash scripts/start_codex_app.sh tester
 ```
 
 The waiter writes:

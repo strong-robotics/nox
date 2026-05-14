@@ -15,7 +15,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 
 # Inject monitor path
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(PROJECT_ROOT, "multi-agent/core"))
 import monitor # type: ignore
 
