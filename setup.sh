@@ -5,8 +5,9 @@ PROJECT_DIR="$(pwd)"
 
 echo "--- INSTALLING NOX ---"
 
-# Move .nox to project root
-mv "$SCRIPT_DIR/.nox" "$PROJECT_DIR/.nox"
+# Copy .nox contents to project root
+mkdir -p "$PROJECT_DIR/.nox"
+cp -r "$SCRIPT_DIR/.nox/." "$PROJECT_DIR/.nox/"
 
 # Create tasks file
 touch "$PROJECT_DIR/multi-agent.tasks.txt"
