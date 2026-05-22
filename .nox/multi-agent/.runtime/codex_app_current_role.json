@@ -1,7 +1,0 @@
-{
-  "role": "Developer",
-  "role_lower": "developer",
-  "mode": "codex_app_chat",
-  "strategy": "heartbeat_direct_status_check",
-  "last_updated": "2026-05-13T17:56:51Z"
-}
