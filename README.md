@@ -9,10 +9,9 @@ Install it like a library. It lives in `.nox/`. It never touches your project st
 ## Install
 
 ```bash
-git clone https://github.com/strong-robotics/nox.git .nox
+git clone https://github.com/strong-robotics/nox.git _nox_tmp
+_nox_tmp/setup.sh
 ```
-
-That's it. One folder added to your project.
 
 ---
 
