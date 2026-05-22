@@ -6,7 +6,7 @@
 
 ### RULE 1: Skip Flags Do NOT Mean "Skip Research"
 **⚠️ MOST IMPORTANT:**
-- If you see `Skip Designer: True` and `Skip Developer: True` → you STILL do complete research
+- If you see `Skip Designer: True` and/or `Skip Developer: True` and/or `Skip Tester: True` → you STILL do complete research
 - Skip flags mean "skip implementation by that agent", NOT "skip your work"
 - If you see ANY skip flag and don't do research → you have FAILED
 
@@ -21,7 +21,7 @@
 - No code changes. Ever.
 
 ### RULE 4: 🔴 NEVER Call `pop_task.py` or `archive_task.py` Unless You Are The Last Agent
-- **ONLY** call `pop_task.py` + `archive_task.py` when you are finishing a **Skip Both (Research Only)** task.
+- **ONLY** call `pop_task.py` + `archive_task.py` when you are finishing a **Skip All (Designer & Developer & Tester)** task.
 - When Developer is in the pipeline and Tester is not skipped → **Tester** is the last agent and handles archive/pop.
 - When Developer is in the pipeline and Tester is skipped → **Developer** is the last agent and handles archive/pop.
 - When Developer is skipped but Designer runs → **Designer** handles archive/pop.
@@ -153,9 +153,11 @@ Ensure that the JSON is perfectly valid and is an object containing the `"pipeli
 → Wait for **Designer `completed`** signal → then Global Reset → Jump to Step 5
 - 🔴 **DO NOT call `pop_task.py` or `archive_task.py`** — Designer handles cleanup.
 
-**If Skip Both (Designer & Developer) - RESEARCH ONLY:**
-- You MUST have completed full research in step 3 (or FAILED)
-- Your artifacts MUST contain detailed findings
+**If Skip All (Designer & Developer & Tester) - ARCHITECT IS EXECUTOR:**
+- You are the only agent. You MUST complete the task fully — not just plan it.
+- After research and artifacts: **execute the task yourself** using your tools.
+- You MUST complete the work before archiving.
+- Your artifacts MUST contain a summary of what was done
 - Update `status.json` first so `archive_task.py` captures final Architect timestamps:
   - Set Architect `"status": "completed"`
   - Set Architect `"completed_at": "<CURRENT_ISO_TIME>"`
@@ -381,11 +383,12 @@ Action: Design new banner component
 
 ---
 
-### Scenario D: Skip Designer + Skip Developer (RESEARCH ONLY MODE)
+### Scenario D: Skip Designer + Skip Developer + Skip Tester (ARCHITECT IS EXECUTOR)
 ```yaml
 --- task X
 Skip Designer: True
 Skip Developer: True
+Skip Tester: True
 Action: Investigate Reserved Shares bug
 Goal: Document where hardcoded "3 shares" comes from
 ---

@@ -29,8 +29,12 @@ Generate technical specifications (`./.nox/multi-agent/core/specs/`) based on th
    - Safely overwrite `status.json` to ensure it remains a perfectly valid JSON object. **Antigravity**: use `write_to_file`. **Cursor (Claude Code)**: use the `Write` tool. **Codex**: use regular local filesystem edits.
    - Set `"completed_at": "<CURRENT_ISO_TIME>"` for Designer role in the pipeline array.
    - Set Designer `"status": "completed"` in the pipeline array.
-   - **Regular (Developer Active)**:
+   - **Regular (Developer Active, Tester Active)**:
      - Set Developer `"status": "ready"` in the pipeline array.
+     - Jump to step 6 (Eternal Loop)
+   - **Skip Tester only (Developer is Last)**:
+     - Set Developer `"status": "ready"` in the pipeline array.
+     - 🔴 **DO NOT archive/pop** — Developer is last agent and handles cleanup.
      - Jump to step 6 (Eternal Loop)
    - **Skip Developer (Designer is Last)**:
      - Set Designer `"status": "completed"` and `"completed_at": "<CURRENT_ISO_TIME>"` before archiving so `archive_task.py` captures final Designer timestamps.
