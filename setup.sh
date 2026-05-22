@@ -12,8 +12,7 @@ mv "$SCRIPT_DIR/.nox" "$PROJECT_DIR/.nox"
 touch "$PROJECT_DIR/multi-agent.tasks.txt"
 
 # Update .gitignore
-echo ".nox/" >> "$PROJECT_DIR/.gitignore"
-echo "multi-agent.tasks.txt" >> "$PROJECT_DIR/.gitignore"
+printf "\n.nox/\nmulti-agent.tasks.txt\n" >> "$PROJECT_DIR/.gitignore"
 
 # Remove temp clone
 rm -rf "$SCRIPT_DIR"
