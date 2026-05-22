@@ -96,7 +96,11 @@ After writing status.json (`Designer: ready`, `Developer: completed/skipped`, `T
 Wait for **Designer completed** (no Tester in this flow).
 Designer handles cleanup (archive + pop) on its own.
 
-### STEP 4 — Skip Both (Research Only):
+### STEP 4 — Skip All (Designer + Developer + Tester) — ARCHITECT IS EXECUTOR:
+Architect executes the task itself, then runs `archive_task.py` + `pop_task.py` + deletes artifacts →
+**Immediately start Step 1 Monitor.** No waiting.
+
+### STEP 4 — Skip Both Designer+Developer (no Tester either):
 After running `archive_task.py` + `pop_task.py` + deleting artifacts →
 **Immediately start Step 1 Monitor.** No waiting.
 
@@ -113,3 +117,4 @@ Monitor (persistent: true) is the eternal loop for Claude Code. It lives for the
 | Skip Designer + Skip Tester | Monitor: wait `Developer completed` → Global Reset → Step 1 Monitor |
 | Skip Developer | Monitor: wait `Designer completed` → Global Reset → Step 1 Monitor |
 | Skip Both (Designer+Developer) | Immediately → Step 1 Monitor (no wait, Architect did cleanup) |
+| **Skip All (Designer+Developer+Tester)** | **Execute task → Immediately → Step 1 Monitor** |

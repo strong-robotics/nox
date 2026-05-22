@@ -35,5 +35,6 @@ Codex is neither Antigravity nor Cursor:
 2. Read and strictly follow [shared_global_rules.md](./.nox/multi-agent/core/shared_global_rules.md).
 3. Follow [shared_architect.md](./.nox/multi-agent/core/shared_architect.md), applying the Codex execution model above wherever shared instructions mention host-specific tooling.
 4. For full pipeline and skip-designer flows, wait for `Tester completed` before global reset.
-5. For skip-tester flows, wait for `Developer completed` before global reset.
+5. For skip-tester flows (Developer still runs), wait for `Developer completed` before global reset.
 6. For skip-developer flows, wait for `Designer completed`.
+7. For skip-all flows (Skip Designer + Skip Developer + Skip Tester), Architect executes the task itself — no waiting, immediately go to next task.
