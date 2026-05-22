@@ -1,0 +1,12 @@
+{
+    "project": "Project Name",
+    "last_updated": "2026-05-21T10:32:17Z",
+    "run_id": "run_20260521_103217",
+    "pipeline": [
+        { "role": "Architect", "status": "completed", "started_at": "2026-05-21T10:31:23Z", "completed_at": "2026-05-21T10:32:17Z", "description": "Plan ready. Designer and Tester skipped.", "chat_name": "Cursor Architect" },
+        { "role": "Designer", "status": "completed", "started_at": null, "completed_at": null, "description": "Skipped per task flag.", "chat_name": "Designer" },
+        { "role": "Developer", "status": "ready", "started_at": null, "completed_at": null, "description": "Start implementation immediately.", "chat_name": "Developer" },
+        { "role": "Tester", "status": "completed", "started_at": null, "completed_at": null, "description": "Skipped per task flag.", "chat_name": "Tester", "qa_attempts": 0 }
+    ],
+    "current_task": "task 3"
+}

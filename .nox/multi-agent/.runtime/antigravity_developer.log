@@ -1,0 +1,158 @@
+[13:38:55] START ppid=1622 pid=1559
+[13:38:55] status=ready
+[13:38:55] SIGNAL RECEIVED: ready
+[13:39:26] START ppid=1622 pid=4826
+[13:39:26] status=completed
+[13:41:05] status=waiting
+[13:41:41] status=ready
+[13:41:41] SIGNAL RECEIVED: ready
+[13:42:04] START ppid=1622 pid=22226
+[13:42:04] status=completed
+[13:42:10] status=waiting
+[13:45:25] status=ready
+[13:45:25] SIGNAL RECEIVED: ready
+[13:45:50] START ppid=1622 pid=41755
+[13:45:50] status=completed
+[13:45:53] status=waiting
+[13:54:58] status=ready
+[13:54:58] SIGNAL RECEIVED: ready
+[13:55:23] START ppid=1622 pid=15676
+[13:55:23] status=completed
+[13:55:26] status=waiting
+[14:10:25] TIMEOUT exit(2) — restart if alive
+[14:10:27] START ppid=1622 pid=36486
+[14:10:27] status=waiting
+[14:25:28] TIMEOUT exit(2) — restart if alive
+[14:25:30] START ppid=1622 pid=53449
+[14:25:30] status=waiting
+[14:40:31] TIMEOUT exit(2) — restart if alive
+[14:40:32] START ppid=1622 pid=70041
+[14:40:32] status=waiting
+[14:54:23] status=ready
+[14:54:23] SIGNAL RECEIVED: ready
+[14:54:45] START ppid=1622 pid=80964
+[14:54:45] status=completed
+[14:58:04] status=waiting
+[15:09:48] TIMEOUT exit(2) — restart if alive
+[22:38:31] START ppid=1323 pid=34698
+[22:38:31] status=waiting
+[22:53:34] TIMEOUT exit(2) — restart if alive
+[22:53:35] START ppid=1323 pid=41556
+[22:53:35] status=waiting
+[23:08:38] TIMEOUT exit(2) — restart if alive
+[23:08:40] START ppid=1323 pid=48533
+[23:08:40] status=waiting
+[23:23:42] TIMEOUT exit(2) — restart if alive
+[23:23:44] START ppid=1323 pid=55091
+[23:23:44] status=waiting
+[23:38:46] TIMEOUT exit(2) — restart if alive
+[23:38:48] START ppid=1323 pid=63232
+[23:38:48] status=waiting
+[23:53:51] TIMEOUT exit(2) — restart if alive
+[23:53:52] START ppid=1323 pid=70407
+[23:53:52] status=waiting
+[00:08:55] TIMEOUT exit(2) — restart if alive
+[00:08:56] START ppid=1323 pid=77430
+[00:08:56] status=waiting
+[00:23:59] TIMEOUT exit(2) — restart if alive
+[00:24:01] START ppid=1323 pid=84429
+[00:24:01] status=waiting
+[00:39:03] TIMEOUT exit(2) — restart if alive
+[00:39:05] START ppid=1323 pid=91972
+[00:39:05] status=waiting
+[00:54:07] TIMEOUT exit(2) — restart if alive
+[00:54:09] START ppid=1323 pid=96333
+[00:54:09] status=waiting
+[01:08:59] status=ready
+[01:08:59] SIGNAL RECEIVED: ready
+[01:09:38] START ppid=1323 pid=16556
+[01:09:38] status=waiting
+[01:10:20] status=ready
+[01:10:20] SIGNAL RECEIVED: ready
+[01:10:50] START ppid=1323 pid=17472
+[01:10:50] status=waiting
+[01:11:32] status=ready
+[01:11:32] SIGNAL RECEIVED: ready
+[01:12:03] START ppid=1323 pid=18370
+[01:12:03] status=waiting
+[01:18:06] status=ready
+[01:18:06] SIGNAL RECEIVED: ready
+[01:18:38] START ppid=1323 pid=24179
+[01:18:38] status=waiting
+[01:19:20] status=ready
+[01:19:20] SIGNAL RECEIVED: ready
+[01:19:50] START ppid=1323 pid=25076
+[01:19:50] status=waiting
+[01:20:32] status=ready
+[01:20:32] SIGNAL RECEIVED: ready
+[01:21:04] START ppid=1323 pid=26307
+[01:21:04] status=waiting
+[01:23:10] status=ready
+[01:23:10] SIGNAL RECEIVED: ready
+[01:23:41] START ppid=1323 pid=28414
+[01:23:41] status=waiting
+[01:24:23] status=ready
+[01:24:23] SIGNAL RECEIVED: ready
+[01:24:54] START ppid=1323 pid=29396
+[01:24:54] status=waiting
+[01:25:40] status=ready
+[01:25:40] SIGNAL RECEIVED: ready
+[01:26:13] START ppid=1323 pid=30415
+[01:26:13] status=waiting
+[01:28:55] status=ready
+[01:28:55] SIGNAL RECEIVED: ready
+[01:29:29] START ppid=1323 pid=33044
+[01:29:29] status=waiting
+[01:30:14] status=ready
+[01:30:14] SIGNAL RECEIVED: ready
+[01:30:46] START ppid=1323 pid=33522
+[01:30:46] status=waiting
+[01:31:34] status=ready
+[01:31:34] SIGNAL RECEIVED: ready
+[01:32:09] START ppid=1323 pid=33994
+[01:32:09] status=waiting
+[01:33:03] status=ready
+[01:33:03] SIGNAL RECEIVED: ready
+[01:33:36] START ppid=1323 pid=34563
+[01:33:36] status=waiting
+[11:06:11] START ppid=1323 pid=96076
+[11:06:11] status=waiting
+[11:09:33] status=ready
+[11:09:33] SIGNAL RECEIVED: ready
+[11:10:18] START ppid=1323 pid=4981
+[11:10:18] status=completed
+[11:13:30] status=waiting
+[11:25:20] TIMEOUT exit(2) — restart if alive
+[11:25:24] START ppid=1323 pid=32877
+[11:25:24] status=waiting
+[19:24:27] START ppid=88823 pid=88824
+[19:24:27] status=waiting
+[20:04:20] START ppid=47439 pid=47440
+[20:04:20] status=waiting
+[20:19:20] TIMEOUT exit(2) — restart if alive
+[20:19:24] START ppid=69890 pid=69891
+[20:19:24] status=waiting
+[20:34:25] TIMEOUT exit(2) — restart if alive
+[20:34:27] START ppid=92056 pid=92057
+[20:34:27] status=waiting
+[20:49:29] TIMEOUT exit(2) — restart if alive
+[20:49:31] START ppid=21006 pid=21007
+[20:49:31] status=waiting
+[21:04:32] TIMEOUT exit(2) — restart if alive
+[22:07:11] START ppid=34893 pid=34894
+[22:07:11] status=waiting
+[11:17:11] START ppid=47631 pid=4138
+[11:17:11] status=waiting
+[11:24:06] START ppid=47631 pid=15281
+[11:24:06] status=waiting
+[11:24:30] status=ready
+[11:24:30] SIGNAL RECEIVED: ready
+[11:25:18] START ppid=47631 pid=16068
+[11:25:18] status=waiting
+[11:30:28] status=ready
+[11:30:28] SIGNAL RECEIVED: ready
+[11:30:54] START ppid=47631 pid=20493
+[11:30:54] status=completed
+[11:30:57] status=waiting
+[11:31:39] status=ready
+[11:31:39] SIGNAL RECEIVED: ready

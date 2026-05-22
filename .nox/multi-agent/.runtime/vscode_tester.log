@@ -1,0 +1,39 @@
+[00:31:19] START ppid=69899 pid=70368
+[00:31:19] status=waiting
+[00:31:28] EXIT: language_server gone from parent chain
+[00:31:43] START ppid=71088 pid=71556
+[00:31:43] status=waiting
+[00:31:52] EXIT: language_server gone from parent chain
+[00:32:09] START ppid=71786 pid=72254
+[00:32:09] status=waiting
+[00:32:18] EXIT: language_server gone from parent chain
+[00:32:24] START ppid=72457 pid=72925
+[00:32:24] status=waiting
+[00:32:33] EXIT: language_server gone from parent chain
+[00:32:39] START ppid=73126 pid=73596
+[00:32:39] status=waiting
+[00:32:48] EXIT: language_server gone from parent chain
+[00:32:54] START ppid=73799 pid=74269
+[00:32:54] status=waiting
+[00:33:03] EXIT: language_server gone from parent chain
+[00:33:10] START ppid=74536 pid=75009
+[00:33:10] status=waiting
+[00:33:19] EXIT: language_server gone from parent chain
+[00:33:24] START ppid=75380 pid=75884
+[00:33:24] status=waiting
+[00:33:33] EXIT: language_server gone from parent chain
+[00:33:40] START ppid=76198 pid=76671
+[00:33:40] status=waiting
+[00:33:49] EXIT: language_server gone from parent chain
+[00:33:54] START ppid=76963 pid=77431
+[00:33:54] status=waiting
+[00:34:03] EXIT: language_server gone from parent chain
+[00:34:08] START ppid=77728 pid=78199
+[00:34:08] status=waiting
+[00:34:17] EXIT: language_server gone from parent chain
+[00:34:22] START ppid=78482 pid=78964
+[00:34:22] status=waiting
+[00:34:31] EXIT: language_server gone from parent chain
+[00:34:36] START ppid=79181 pid=79661
+[00:34:36] status=waiting
+[00:34:45] EXIT: language_server gone from parent chain

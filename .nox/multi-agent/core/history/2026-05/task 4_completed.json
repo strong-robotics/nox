@@ -1,0 +1,48 @@
+{
+  "task_id": "task 4",
+  "title": "Create a yellow cube button widget with icon",
+  "status": "completed",
+  "created_at": "run_20260513_181330",
+  "completed_at": "2026-05-13T18:15:18.620401",
+  "duration_minutes": 1.8,
+  "input": {
+    "description": "# Task Metadata\n\n## Task ID\ntask 4\n\n## Title\nCreate a yellow cube button widget with icon\n\n## Stack\nFlutter\n\n## Action\nCreate a yellow cube button widget with icon\n\n## Skip Flags\n- Skip Designer: True\n- Skip Developer: False\n- Skip Tester: True\n\n## Max QA Retries\n3 (default)\n\n## Instructions\nCreate test/yellow_cube_button.dart with a StatelessWidget called YellowCubeButton. 80x80 yellow square. Center a star icon (Icons.star, color: Colors.white, size: 32). Prints \"Yellow pressed\" on tap.\n",
+    "source": "multi-agent.tasks.txt"
+  },
+  "pipeline": [
+    {
+      "role": "Architect",
+      "status": "completed",
+      "started_at": "2026-05-13T18:13:30Z",
+      "completed_at": "2026-05-13T18:13:45Z",
+      "duration_minutes": 0.2
+    },
+    {
+      "role": "Designer",
+      "status": "completed",
+      "started_at": null,
+      "completed_at": null,
+      "duration_minutes": null
+    },
+    {
+      "role": "Developer",
+      "status": "completed",
+      "started_at": "2026-05-13T18:14:47Z",
+      "completed_at": "2026-05-13T18:15:18Z",
+      "duration_minutes": 0.5
+    },
+    {
+      "role": "Tester",
+      "status": "completed",
+      "started_at": null,
+      "completed_at": null,
+      "duration_minutes": null
+    }
+  ],
+  "artifacts": {
+    "implementation_plan": "# Implementation Plan: Create a yellow cube button widget with icon\n\n## Goal\nCreate `test/yellow_cube_button.dart` containing a `YellowCubeButton` StatelessWidget \u2014 an 80x80 yellow square with a centered white star icon that prints \"Yellow pressed\" on tap.\n\n## Owns (Files to Create/Modify)\n- **Create**: `test/yellow_cube_button.dart` \u2014 new StatelessWidget file\n\n## Integrates Into\n- Standalone widget in `test/` directory \u2014 no integration into existing app tree required\n\n## Implementation Details\n",
+    "task_description": "# Task Metadata\n\n## Task ID\ntask 4\n\n## Title\nCreate a yellow cube button widget with icon\n\n## Stack\nFlutter\n\n## Action\nCreate a yellow cube button widget with icon\n\n## Skip Flags\n- Skip Designer: True\n- Skip Developer: False\n- Skip Tester: True\n\n## Max QA Retries\n3 (default)\n\n## Instructions\nCreate test/yellow_cube_button.dart with a StatelessWidget called YellowCubeButton. 80x80 yellow square. Center a star icon (Icons.star, color: Colors.white, size: 32). Prints \"Yellow pressed\" on tap.\n",
+    "qa_feedback": ""
+  },
+  "notes": ""
+}

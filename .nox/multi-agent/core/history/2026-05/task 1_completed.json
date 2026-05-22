@@ -1,0 +1,48 @@
+{
+  "task_id": "task 1",
+  "title": "Summary",
+  "status": "completed",
+  "created_at": "run_20260521_102348",
+  "completed_at": "2026-05-21T10:25:14.072449",
+  "duration_minutes": 1.3,
+  "input": {
+    "description": "# Task Metadata\n\n- **ID**: task 1\n- **Title**: Create a red cube button widget\n- **Stack**: Flutter\n- **Skip Designer**: True\n- **Skip Developer**: False\n- **Skip Tester**: True\n- **Max QA Retries**: 3 (default)\n\n## Summary\n\nCreate a standalone Flutter StatelessWidget file at `test/red_cube_button.dart`. No external dependencies required.\n",
+    "source": "multi-agent.tasks.txt"
+  },
+  "pipeline": [
+    {
+      "role": "Architect",
+      "status": "completed",
+      "started_at": "2026-05-21T10:23:48Z",
+      "completed_at": "2026-05-21T10:24:54Z",
+      "duration_minutes": 1.1
+    },
+    {
+      "role": "Designer",
+      "status": "completed",
+      "started_at": null,
+      "completed_at": null,
+      "duration_minutes": null
+    },
+    {
+      "role": "Developer",
+      "status": "completed",
+      "started_at": "2026-05-21T10:24:35Z",
+      "completed_at": "2026-05-21T10:25:05Z",
+      "duration_minutes": 0.5
+    },
+    {
+      "role": "Tester",
+      "status": "completed",
+      "started_at": null,
+      "completed_at": null,
+      "duration_minutes": null
+    }
+  ],
+  "artifacts": {
+    "implementation_plan": "# Implementation Plan: Create a red cube button widget\n\n## Goal\nCreate `test/red_cube_button.dart` containing a StatelessWidget `RedCubeButton` \u2014 an 80\u00d780 red square that prints \"Red pressed\" to console on tap.\n\n## Owns (Files to Create/Modify)\n- **Create**: `test/red_cube_button.dart` \u2014 new standalone widget file\n\n## Integrates Into\n- Standalone file, no integration points required\n\n## Implementation Details\n- **Stack**: Flutter\n- **Approach**:\n  1. Create `test/` directory if it does not exist",
+    "task_description": "# Task Metadata\n\n- **ID**: task 1\n- **Title**: Create a red cube button widget\n- **Stack**: Flutter\n- **Skip Designer**: True\n- **Skip Developer**: False\n- **Skip Tester**: True\n- **Max QA Retries**: 3 (default)\n\n## Summary\n\nCreate a standalone Flutter StatelessWidget file at `test/red_cube_button.dart`. No external dependencies required.\n",
+    "qa_feedback": ""
+  },
+  "notes": ""
+}
