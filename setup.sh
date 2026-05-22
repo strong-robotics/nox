@@ -9,6 +9,11 @@ echo "--- INSTALLING NOX ---"
 mkdir -p "$PROJECT_DIR/.nox"
 cp -r "$SCRIPT_DIR/.nox/." "$PROJECT_DIR/.nox/"
 
+# Clear stale artifacts and runtime from previous sessions
+rm -f "$PROJECT_DIR/.nox/multi-agent/core/artifacts/"*.md 2>/dev/null
+rm -f "$PROJECT_DIR/.nox/multi-agent/.runtime/"*.pid 2>/dev/null
+rm -f "$PROJECT_DIR/.nox/multi-agent/.runtime/heartbeat_"*.json 2>/dev/null
+
 # Create tasks file
 touch "$PROJECT_DIR/multi-agent.tasks.txt"
 
