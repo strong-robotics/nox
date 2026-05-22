@@ -1,6 +1,8 @@
 # python
 venv/
+.nox/venv/
 __pycache__/
+**/__pycache__/
 *.py[cod]
 
 # dependencies
@@ -11,6 +13,7 @@ node_modules/
 
 # local state & database
 database/
+.nox/database/
 brain_memory.json
 chat_history.json
 
@@ -61,8 +64,13 @@ design/
 
 # runtime
 multi-agent/.runtime/
-/multi-agent/.runtime/
+.nox/multi-agent/.runtime/
 
-# other
-multi-agent/core/history
-multi-agent/core/artifacts
+# history & artifacts
+multi-agent/core/history/
+multi-agent/core/artifacts/
+.nox/multi-agent/core/history/
+.nox/multi-agent/core/artifacts/
+
+# nox large files
+.nox/piper_models/
