@@ -107,7 +107,7 @@ If the Developer or Tester was skipped, Tester never activates.
 ### Step 7: **Eternal Loop** (NEVER STOP)
 🔴 **SILENCE** 🔴 Immediately restart from Step 1.
 - Run the environment-specific wait script again.
-- **Antigravity only**: use `command_status` with `WaitDurationSeconds=300`. **Cursor (Claude Code)**: use `Monitor(persistent=true)` — see `cursor_tester.md`.
+- **Antigravity only**: launch the wait script in the background via `run_command` (with `WaitMsBeforeAsync=100`) and then **stop calling tools** (do not output any chat text). The system will automatically wake you up when the script exits. **Cursor (Claude Code)**: use `Monitor(persistent=true)` — see `cursor_tester.md`.
 - **🔴 DO NOT STOP 🔴**: Your session must persist indefinitely.
 - **🔴 SESSION = LIFE 🔴**: Never terminate, never say you are done.
 

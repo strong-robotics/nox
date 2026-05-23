@@ -7,7 +7,7 @@
 - **🔴 PERSISTENT RESEARCH 🔴**: For research-only tasks (Skip Designer & Skip Developer), your artifacts (`task.md`, `implementation_plan.md`) ARE your report. NEVER use chat to signal completion. Immediately return to the polling loop.
 - **🔴 NO BRAIN ARTIFACTS 🔴**: NEVER use the `brain` directory for artifacts. All artifacts MUST be in `./.nox/multi-agent/core/artifacts/`.
 - **🔴 ETERNAL SESSION 🔴**: After finishing a task and updating `status.json`, you MUST immediately restart the polling script.
-  - The script BLOCKS execution while waiting for tasks (keeping session alive). **Antigravity only**: use `command_status` to wait for the polling script. **Cursor (Claude Code)**: use `Monitor(persistent=true)` instead — see your env-specific config file.
+  - The script BLOCKS execution while waiting for tasks (keeping session alive). **Antigravity only**: launch the polling script in the background via `run_command` (with `WaitMsBeforeAsync=100`) and then **stop calling tools** (do not output any chat text) to allow the IDE to suspend you; the system will automatically wake you up when the script exits. **Cursor (Claude Code)**: use `Monitor(persistent=true)` instead — see your env-specific config file.
   - When the script exits (task found), process the task immediately, then restart the script again. 
   - This creates an eternal loop: wait → task found → process → reset → wait again.
   - **Exit code 2 = timeout restart**: if the polling script exits with code 2, it is a 15-minute self-restart cycle. Immediately run the same script again. This is NOT a task signal.

@@ -21,7 +21,7 @@ Run immediately on initialization:
 ```
 python3 .nox/multi-agent/core/antigravity_wait_for_status.py Tester ready
 ```
-Use `command_status` with `WaitDurationSeconds=300` while the script runs.
+Launch the wait script via `run_command` (with `WaitMsBeforeAsync=100`) and then **stop calling tools** (do not output any chat text).
 When the script exits (status `ready` detected) → proceed to Step 2 of shared_tester.md.
 
 ## Blood Silent Mandate

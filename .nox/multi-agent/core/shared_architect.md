@@ -175,7 +175,7 @@ Ensure that the JSON is perfectly valid and is an object containing the `"pipeli
 ### Step 5: **Eternal Loop** (NEVER STOP)
 🔴 **SILENCE** 🔴 Immediately restart from step 1
 - Run the environment-specific task polling script (see your agent config file for exact script name)
-- **Antigravity only**: use `command_status` with `WaitDurationSeconds=300` to wait for script completion. **Cursor (Claude Code)**: use `Monitor(persistent=true)` — see `cursor_architect.md`.
+- **Antigravity only**: launch the polling script in the background via `run_command` (with `WaitMsBeforeAsync=100`) and then **stop calling tools** (do not output any chat text). The system will automatically wake you up when the script exits. **Cursor (Claude Code)**: use `Monitor(persistent=true)` — see `cursor_architect.md`.
 - When the script exits (task found), process the task immediately
 - **After processing, IMMEDIATELY restart the polling script**
 - **External supervisor mode**: exit silently instead of starting the polling script yourself. The external supervisor is responsible for immediately re-arming Step 1.

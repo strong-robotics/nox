@@ -96,7 +96,7 @@ Implement components, hooks, and services according to the plan. Perform basic b
 7. **Eternal Loop** (NEVER STOP): 🔴 **SILENCE** 🔴
    - Immediately restart from step 1.
    - Run the environment-specific polling script (see your agent config file for exact script name).
-   - **Antigravity only**: use `command_status` with `WaitDurationSeconds=300` to wait for the polling script to finish. **Cursor (Claude Code)**: use `Monitor(persistent=true)` — see `cursor_developer.md`.
+   - **Antigravity only**: launch the polling script in the background via `run_command` (with `WaitMsBeforeAsync=100`) and then **stop calling tools** (do not output any chat text). The system will automatically wake you up when the script exits. **Cursor (Claude Code)**: use `Monitor(persistent=true)` — see `cursor_developer.md`.
    - **🔴 DO NOT STOP 🔴**: When the script exits (status found), process the task immediately, then restart the script again.
    - **External supervisor mode**: exit silently instead of starting the polling script yourself. The external supervisor is responsible for immediately re-arming step 1.
    - **🔴 SESSION = LIFE 🔴**: Your session must persist indefinitely. Never terminate.
