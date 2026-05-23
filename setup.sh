@@ -17,6 +17,17 @@ rm -f "$PROJECT_DIR/.nox/multi-agent/.runtime/heartbeat_"*.json 2>/dev/null
 # Create tasks file
 touch "$PROJECT_DIR/multi-agent.tasks.txt"
 
+# Linear API key (optional)
+echo ""
+read -r -p "Linear API key (press Enter to skip): " LINEAR_KEY
+if [[ -n "$LINEAR_KEY" ]]; then
+  printf "LINEAR_API_KEY=%s\n" "$LINEAR_KEY" > "$PROJECT_DIR/.nox/.env"
+  echo "  ✓ Saved to .nox/.env"
+else
+  touch "$PROJECT_DIR/.nox/.env"
+  echo "  ✓ Skipped (add LINEAR_API_KEY to .nox/.env later to enable Linear integration)"
+fi
+
 # Update .gitignore
 printf "\n.nox/\nmulti-agent.tasks.txt\n" >> "$PROJECT_DIR/.gitignore"
 

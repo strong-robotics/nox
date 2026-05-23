@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-// Read API key from .env in the project root
-const ENV_PATH = path.join(process.cwd(), '.env');
+// Read API key from .nox/.env
+const ENV_PATH = path.join(process.cwd(), '.nox', '.env');
 let LINEAR_API_KEY = '';
 
 try {
@@ -12,7 +12,7 @@ try {
     LINEAR_API_KEY = match[1].trim();
   }
 } catch (err) {
-  console.error('⚠️ Could not read .env at', ENV_PATH);
+  console.error('⚠️ Could not read .nox/.env at', ENV_PATH, '— add LINEAR_API_KEY=... to enable Linear integration');
   process.exit(1);
 }
 

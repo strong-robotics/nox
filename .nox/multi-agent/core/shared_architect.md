@@ -101,7 +101,9 @@ Orchestrate the pipeline across multiple projects. Convert `multi-agent.tasks.tx
   - Create/Update `./.nox/multi-agent/core/artifacts/implementation_plan.md` using extracted data.
   - Create/Update `./.nox/multi-agent/core/artifacts/task.md` (metadata).
 - **🔴 LINEAR INTEGRATION** (if task includes Linear ID):
-  1. **Security**: Linear API key is stored in `.env` as `LINEAR_API_KEY`
+  1. **Security**: Linear API key is stored in `.nox/.env` as `LINEAR_API_KEY`.
+     Get your key at: **linear.app → Settings → API → Personal API keys**.
+     If the file is missing or the key is empty, skip Linear fetch and rely on task `Instructions:` only.
   2. **Data Collection**: Run `node multi-agent/workflows/linear-task-investigation.mjs [ID]`
   3. **Context Extraction**: The script returns:
      - **Description**: Core requirements

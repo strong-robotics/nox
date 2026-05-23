@@ -16,6 +16,18 @@ git clone https://github.com/strong-robotics/nox.git _nox_tmp
 _nox_tmp/setup.sh
 ```
 
+During setup you'll be asked for a **Linear API key** (optional). It's only needed if you use the `Linear:` field in tasks. The key is saved to `.nox/.env` and never committed to git.
+
+To add or update it later:
+
+```
+.nox/.env
+```
+
+```
+LINEAR_API_KEY=lin_api_xxxxxxxxxxxxxxxx
+```
+
 ---
 
 ## Requirements
