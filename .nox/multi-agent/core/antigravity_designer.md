@@ -13,7 +13,7 @@
 
 ### STARTUP — Write PID file (run once before Step 1):
 ```bash
-mkdir -p multi-agent/.runtime && P=$$; while [ "$P" != "1" ] && [ -n "$P" ]; do ps -p "$P" -o command= 2>/dev/null | grep -q "language_server" && echo "$P" > multi-agent/.runtime/antigravity_designer.pid && break; P=$(ps -p "$P" -o ppid= 2>/dev/null | tr -d ' ' || echo "1"); done
+mkdir -p .nox/multi-agent/.runtime && P=$$; while [ "$P" != "1" ] && [ -n "$P" ]; do ps -p "$P" -o command= 2>/dev/null | grep -q "language_server" && echo "$P" > .nox/multi-agent/.runtime/antigravity_designer.pid && break; P=$(ps -p "$P" -o ppid= 2>/dev/null | tr -d ' ' || echo "1"); done
 ```
 
 ## ALGORITHM:
